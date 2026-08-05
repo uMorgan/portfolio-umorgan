@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 44" fill="none"
+     stroke="#FF9E2C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <!-- chevron de prompt -->
+  <path d="M3 12 L12 22 L3 32" />
+  <!-- u : haste esquerda curta, base arredondada, haste direita sobe e vira o M -->
+  <path d="M22 16 V27 a10 10 0 0 0 20 0 V9" />
+  <!-- M : compartilha a haste direita do u -->
+  <path d="M42 9 L57 26 L72 9 V35" />
+</svg>

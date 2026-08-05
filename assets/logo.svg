@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 78 44" fill="none"
+     stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+  <!-- chevron de prompt -->
+  <path d="M4 13 L13 22 L4 31"/>
+  <!-- u: haste curta à esquerda, bojo, haste longa à direita -->
+  <path d="M23 15 V24"/>
+  <path d="M23 24 a9.5 9.5 0 0 0 19 0"/>
+  <!-- a haste direita do u é também a haste esquerda do M -->
+  <path d="M42 24 V8"/>
+  <!-- M -->
+  <path d="M42 8 L55.5 27"/>
+  <path d="M55.5 27 L69 8"/>
+  <path d="M69 8 V34"/>
+</svg>

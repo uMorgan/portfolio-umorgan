@@ -1,0 +1,330 @@
+/* ═══ Cenas por projeto ═══════════════════════════════════════════════
+   Cada bloco [data-anim] recebe --q (0→1) do main.js. Aqui esse progresso
+   é fatiado em quatro ATOS, cada um com sua própria curva ease-out, para a
+   cena contar uma sequência de causa e efeito em vez de tudo deslizar junto.
+   ─────────────────────────────────────────────────────────────────────── */
+
+@property --a1{syntax:"<number>";inherits:true;initial-value:0}
+@property --a2{syntax:"<number>";inherits:true;initial-value:0}
+@property --a3{syntax:"<number>";inherits:true;initial-value:0}
+@property --a4{syntax:"<number>";inherits:true;initial-value:0}
+@property --e1{syntax:"<number>";inherits:true;initial-value:0}
+@property --e2{syntax:"<number>";inherits:true;initial-value:0}
+@property --e3{syntax:"<number>";inherits:true;initial-value:0}
+@property --e4{syntax:"<number>";inherits:true;initial-value:0}
+
+[data-anim]{
+  /* atos crus, com leve sobreposição para não haver pausa morta entre eles */
+  --a1:clamp(0, calc(var(--q,0) / .30), 1);
+  --a2:clamp(0, calc((var(--q,0) - .24) / .26), 1);
+  --a3:clamp(0, calc((var(--q,0) - .46) / .26), 1);
+  --a4:clamp(0, calc((var(--q,0) - .70) / .30), 1);
+  /* ease-out quadrática: entra rápido e assenta, nunca linear */
+  --e1:calc(1 - (1 - var(--a1)) * (1 - var(--a1)));
+  --e2:calc(1 - (1 - var(--a2)) * (1 - var(--a2)));
+  --e3:calc(1 - (1 - var(--a3)) * (1 - var(--a3)));
+  --e4:calc(1 - (1 - var(--a4)) * (1 - var(--a4)));
+}
+
+
+
+
+/* Traços desenhados progressivamente: o comprimento real de cada caminho é
+   medido pelo JS (getTotalLength) e devolvido em --len. Chutar esse número no
+   CSS era o que partia a onda de áudio e a moldura do card ao meio. */
+[data-draw]{
+  stroke-dasharray:var(--len,100);
+  stroke-dashoffset:calc(var(--len,100) * (1 - var(--dp,0)));
+}
+
+/* ── trava de rolagem ─────────────────────────────────────────────────
+   1300px por cena ≈ 10 voltas de roda, com o passo já reduzido a 128px.
+   O curso sozinho não resolve o ritmo: quem alonga a animação é a mola no
+   main.js, que faz a cena continuar tocando depois que a rolagem para. */
+.pin{position:relative;height:calc(100vh + 1300px)}
+.pin-inner{
+  position:sticky;top:0;height:100vh;padding-top:var(--nav,52px);
+  display:flex;flex-direction:column;justify-content:center;
+}
+.pin-inner .scn,.pin-inner .gym{margin-top:0}
+@media(max-width:640px){.pin{height:calc(100vh + 950px)}}
+
+/* ── moldura comum ──────────────────────────────────────────────────── */
+.scn{
+  position:relative;padding:1.25rem 1.35rem;margin-top:2rem;
+  border:1px solid var(--line);border-radius:5px;overflow:hidden;
+  background:
+    radial-gradient(120% 80% at 12% 0%,color-mix(in srgb,var(--amber) 5%,transparent),transparent 60%),
+    var(--ink-2);
+}
+/* malha técnica de fundo, quase imperceptível: dá textura sem competir */
+.scn::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:
+    linear-gradient(color-mix(in srgb,var(--paper) 3%,transparent) 1px,transparent 1px) 0 0/100% 1.5rem,
+    linear-gradient(90deg,color-mix(in srgb,var(--paper) 3%,transparent) 1px,transparent 1px) 0 0/1.5rem 100%;
+  mask-image:radial-gradient(120% 100% at 50% 40%,#000 35%,transparent 78%);
+}
+.scn svg{position:relative;display:block;width:100%;height:auto;overflow:visible}
+.scn text{font-family:var(--mono);font-size:5.2px;fill:var(--muted);letter-spacing:.35px}
+.scn .cap{
+  position:absolute;right:.95rem;bottom:.65rem;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);opacity:calc(var(--e1) * .9);
+}
+.scn line,.scn path,.scn rect,.scn circle,.scn polyline,
+.gym line,.gym path,.gym circle,.gym rect{vector-effect:non-scaling-stroke}
+/* Exceção obrigatória: com non-scaling-stroke o dash passa a ser medido em
+   pixels de tela, enquanto getTotalLength devolve unidades do desenho. A
+   diferença de escala partia a onda e a moldura do card ao meio. */
+.scn [data-draw],.gym [data-draw]{vector-effect:none}
+/* Pivôs relativos à própria peça nas cenas .scn; o .gym usa coordenadas do
+   desenho e por isso fica no view-box padrão. */
+.scn g,.scn line,.scn path,.scn rect,.scn circle{transform-box:fill-box}
+.scn .grid{stroke:color-mix(in srgb,var(--paper) 7%,transparent);stroke-width:1}
+.scn .frame{fill:none;stroke:var(--line);stroke-width:1.2}
+.scn .hint{fill:var(--muted);font-size:4.6px}
+
+/* ═══ 01 · PIPELINE ═════════════════════════════════════════════════════
+   ato 1 varre · ato 2 marca o que mudou · ato 3 envia · ato 4 enfileira  */
+.pipe .reg{fill:color-mix(in srgb,var(--paper) 3%,transparent);stroke:var(--line);stroke-width:1.1}
+.pipe .rid{fill:var(--muted);font-size:4.2px}
+
+/* o feixe desce e some ao chegar no fim */
+.pipe .beam{
+  stroke:var(--cyan);stroke-width:1.4;
+  transform:translateY(calc(var(--e1) * 66px));
+  opacity:calc(1 - var(--a2) * 1.4);
+  filter:drop-shadow(0 0 3px var(--cyan));
+}
+.pipe .beam-glow{
+  fill:url(#beamFade);opacity:calc((1 - var(--a2)) * .5);
+  transform:translateY(calc(var(--e1) * 66px));
+}
+
+/* as duas linhas alteradas acendem só depois que o feixe passa por elas */
+.pipe .chg{stroke:var(--amber);stroke-width:1.4;fill:color-mix(in srgb,var(--amber) 10%,transparent)}
+.pipe .c1{opacity:clamp(0, calc((var(--e1) - .30) * 6), 1)}
+.pipe .c2{opacity:clamp(0, calc((var(--e1) - .62) * 6), 1)}
+.pipe .delta{fill:var(--amber);font-size:4.6px}
+.pipe .d1{opacity:clamp(0, calc((var(--e1) - .34) * 6), 1)}
+.pipe .d2{opacity:clamp(0, calc((var(--e1) - .66) * 6), 1)}
+
+/* saem em fila indiana: a segunda parte um pouco depois da primeira */
+.pipe .fly{fill:color-mix(in srgb,var(--amber) 12%,transparent);stroke:var(--amber);stroke-width:1.3}
+/* Chegam à fila e, no ato 4, somem enquanto a barra enche: foram consumidos. */
+.pipe .f1{
+  opacity:calc(var(--a3) * 1.6 * (1 - clamp(0, calc((var(--a4) - .25) * 2.4), 1)));
+  transform:translate(calc(var(--e3) * 136px), calc(var(--e3) * -8px));
+}
+.pipe .f2{
+  opacity:calc(clamp(0, calc((var(--a3) - .18) * 2), 1) * (1 - clamp(0, calc((var(--a4) - .40) * 2.4), 1)));
+  transform:translate(calc(clamp(0, calc((var(--e3) - .18) / .82), 1) * 136px),
+                      calc(clamp(0, calc((var(--e3) - .18) / .82), 1) * -18px));
+}
+.pipe .trail{
+  stroke:var(--amber);stroke-width:.8;stroke-dasharray:2 3;
+  opacity:calc(var(--a3) * .5 * (1 - var(--a4)));
+}
+
+.pipe .qbox{fill:none;stroke:var(--line);stroke-width:1.2}
+.pipe .qfill{
+  fill:color-mix(in srgb,var(--amber) 30%,transparent);
+  transform-origin:left center;transform:scaleX(var(--e4));
+}
+.pipe .qtick{stroke:color-mix(in srgb,var(--paper) 12%,transparent);stroke-width:.8}
+.pipe .qnum{fill:var(--amber);font-size:5px;opacity:calc(var(--a4) * 1.4)}
+.pipe .note{opacity:calc(var(--a4) * 1.2)}
+.pipe .ok{
+  stroke:var(--cyan);stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;
+  --dp:var(--e4);
+}
+
+/* ═══ 02 · BI ═══════════════════════════════════════════════════════════
+   ato 1 os campos aparecem · ato 2 dois deles vão para a mesa de montagem ·
+   ato 3 aquilo vira SQL de verdade · ato 4 o painel se desenha              */
+.bi .chip rect{fill:color-mix(in srgb,var(--paper) 5%,transparent);stroke:var(--line);stroke-width:1}
+.bi .chip text{fill:var(--muted);font-size:4.4px}
+.bi .ch1{opacity:clamp(0, calc((var(--e1) - .05) * 7), 1)}
+.bi .ch2{opacity:clamp(0, calc((var(--e1) - .20) * 7), 1)}
+.bi .ch3{opacity:clamp(0, calc((var(--e1) - .35) * 7), 1)}
+.bi .ch4{opacity:clamp(0, calc((var(--e1) - .50) * 7), 1)}
+
+/* dois campos escolhidos deslizam para a mesa; os outros dois esmaecem */
+.bi .ch2{transform:translate(calc(var(--e2) * 66px), calc(var(--e2) * -12px))}
+.bi .ch4{transform:translate(calc(var(--e2) * 66px), calc(var(--e2) * -20px))}
+.bi .ch2 rect,.bi .ch4 rect{stroke:var(--amber)}
+.bi .ch1,.bi .ch3{opacity:calc(clamp(0, calc((var(--e1) - .05) * 7), 1) * (1 - var(--e2) * .75))}
+
+.bi .mesa{fill:none;stroke:var(--line);stroke-width:1.2;stroke-dasharray:3 3;
+          opacity:calc(var(--a1) * 1.2)}
+.bi .mesa-lbl{fill:var(--muted);font-size:4.4px;opacity:calc(var(--a1) * 1.2)}
+.bi .mesa-div{stroke:var(--line);stroke-width:1;opacity:calc(var(--e2) * .9)}
+.bi .mesa-hint{fill:var(--muted);font-size:4px;opacity:calc(var(--e2) * .8)}
+
+/* a montagem compila: o SQL aparece linha a linha */
+.bi .sql{fill:color-mix(in srgb,var(--cyan) 6%,transparent);stroke:var(--cyan);stroke-width:1;
+         opacity:calc(var(--a3) * 1.3)}
+.bi .sql-txt{fill:var(--paper);font-size:4.6px}
+.bi .s-a{opacity:clamp(0, calc((var(--e3) - .15) * 5), 1)}
+.bi .s-b{opacity:clamp(0, calc((var(--e3) - .45) * 5), 1)}
+.bi .ro{fill:var(--cyan);font-size:3.8px;opacity:clamp(0, calc((var(--e3) - .70) * 5), 1)}
+
+/* o painel se desenha: eixo primeiro, barras escalonadas, valores por último */
+.bi .axis{stroke:var(--line);stroke-width:1;--dp:var(--e4)}
+.bi .bar{transform-origin:bottom center}
+.bi .b1{fill:var(--cyan); transform:scaleY(clamp(0, calc(var(--e4) / .5), 1))}
+.bi .b2{fill:color-mix(in srgb,var(--amber) 40%,var(--cyan));
+        transform:scaleY(clamp(0, calc((var(--e4) - .12) / .5), 1))}
+.bi .b3{fill:color-mix(in srgb,var(--amber) 70%,var(--cyan));
+        transform:scaleY(clamp(0, calc((var(--e4) - .24) / .5), 1))}
+.bi .b4{fill:var(--amber); transform:scaleY(clamp(0, calc((var(--e4) - .36) / .5), 1))}
+.bi .val{fill:var(--paper);font-size:4.4px}
+.bi .v1{opacity:clamp(0, calc((var(--e4) - .50) * 6), 1)}
+.bi .v2{opacity:clamp(0, calc((var(--e4) - .58) * 6), 1)}
+.bi .v3{opacity:clamp(0, calc((var(--e4) - .66) * 6), 1)}
+.bi .v4{opacity:clamp(0, calc((var(--e4) - .74) * 6), 1)}
+.bi .note{opacity:clamp(0, calc((var(--a4) - .45) * 5), 1)}
+
+/* ═══ 03 · DISCADOR ═════════════════════════════════════════════════════
+   ato 1 digita · ato 2 chama · ato 3 atende · ato 4 transcreve            */
+.dial .fone{fill:color-mix(in srgb,var(--paper) 3%,transparent);stroke:var(--line);stroke-width:1.3}
+.dial .tela{fill:color-mix(in srgb,var(--cyan) 7%,transparent);stroke:color-mix(in srgb,var(--cyan) 22%,transparent);stroke-width:.9}
+.dial .dig{fill:var(--paper);font-size:6.4px;font-family:var(--mono)}
+.dial .caret{fill:var(--cyan);opacity:calc((1 - var(--a2)) * .9)}
+.dial .k{fill:color-mix(in srgb,var(--paper) 4%,transparent);stroke:var(--line);stroke-width:.9}
+.dial .kh{fill:color-mix(in srgb,var(--cyan) 30%,transparent);stroke:var(--cyan);stroke-width:1.2}
+
+/* Ancorado em --a1 (linear), não em --e1: a curva ease-out corre rápido demais
+   no começo e os realces das três primeiras teclas passavam antes de aparecer.
+   Cada tecla acende, fica um instante e apaga; o dígito correspondente entra
+   junto e permanece. */
+.dial .n1{opacity:clamp(0, calc((var(--a1) - .06) * 12), 1)}
+.dial .n2{opacity:clamp(0, calc((var(--a1) - .29) * 12), 1)}
+.dial .n3{opacity:clamp(0, calc((var(--a1) - .52) * 12), 1)}
+.dial .n4{opacity:clamp(0, calc((var(--a1) - .75) * 12), 1)}
+.dial .h1{opacity:calc(clamp(0, calc((var(--a1) - .04) * 10), 1) * (1 - clamp(0, calc((var(--a1) - .26) * 7), 1)))}
+.dial .h2{opacity:calc(clamp(0, calc((var(--a1) - .27) * 10), 1) * (1 - clamp(0, calc((var(--a1) - .49) * 7), 1)))}
+.dial .h3{opacity:calc(clamp(0, calc((var(--a1) - .50) * 10), 1) * (1 - clamp(0, calc((var(--a1) - .72) * 7), 1)))}
+.dial .h4{opacity:calc(clamp(0, calc((var(--a1) - .73) * 10), 1) * (1 - clamp(0, calc((var(--a1) - .95) * 7), 1)))}
+
+.dial .btn{fill:color-mix(in srgb,var(--cyan) 20%,transparent);stroke:var(--cyan);stroke-width:1.2;
+           opacity:calc(var(--a2) * 1.5)}
+.dial .btn-ic{stroke:var(--cyan);stroke-width:1.2;fill:none;opacity:calc(var(--a2) * 1.5)}
+.dial .link{stroke:var(--cyan);stroke-width:1.3;fill:none;--dp:var(--e2)}
+.dial .sinal{
+  fill:var(--cyan);filter:drop-shadow(0 0 4px var(--cyan));
+  transform:translateX(calc(var(--e2) * 66px));
+  opacity:calc(var(--a2) * 1.6 * (1 - var(--a3)));
+}
+/* três anéis saindo do aparelho que toca, com atraso entre eles */
+.dial .ring{fill:none;stroke:var(--cyan);stroke-width:1.1;transform-origin:center}
+.dial .r1{opacity:calc(var(--a3) * (1 - var(--a3)) * 3);transform:scale(calc(.4 + var(--e3) * 1.1))}
+.dial .r2{opacity:calc(clamp(0, calc((var(--a3) - .2) * 2), 1) * (1 - var(--a3)) * 3);
+          transform:scale(calc(.4 + clamp(0, calc((var(--e3) - .2) / .8), 1) * 1.1))}
+.dial .r3{opacity:calc(clamp(0, calc((var(--a3) - .4) * 2), 1) * (1 - var(--a3)) * 3);
+          transform:scale(calc(.4 + clamp(0, calc((var(--e3) - .4) / .6), 1) * 1.1))}
+.dial .atendeu{fill:var(--cyan);font-size:4.4px;opacity:calc(clamp(0, calc((var(--a3) - .55) * 3), 1) * (1 - var(--a4)))}
+
+.dial .onda{stroke:var(--amber);stroke-width:1.3;fill:none;--dp:var(--e4)}
+.dial .linha{fill:color-mix(in srgb,var(--paper) 22%,transparent)}
+.dial .t1{opacity:clamp(0, calc((var(--e4) - .28) * 6), 1)}
+.dial .t2{opacity:clamp(0, calc((var(--e4) - .44) * 6), 1)}
+.dial .t3{opacity:clamp(0, calc((var(--e4) - .60) * 6), 1)}
+.dial .card{fill:none;stroke:var(--cyan);stroke-width:1.1;
+            --dp:clamp(0, calc((var(--e4) - .55) / .45), 1)}
+.dial .note{opacity:clamp(0, calc((var(--a4) - .78) * 5), 1)}
+
+/* ═══ 04 · GYM ══════════════════════════════════════════════════════════ */
+.gym{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+@media(min-width:640px){.gym{grid-template-columns:repeat(3,1fr)}}
+.gym > figure{
+  margin:0;padding:1rem .95rem .8rem;position:relative;
+  background:radial-gradient(90% 70% at 50% 20%,color-mix(in srgb,var(--paper) 4%,transparent),transparent 70%),var(--ink-2);
+}
+.gym svg{display:block;width:100%;height:auto;overflow:visible}
+.gym figcaption{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin-top:.6rem;display:flex;justify-content:space-between;gap:.5rem;
+}
+.gym figcaption b{font-weight:500;color:var(--amber);opacity:calc(var(--a4) * 1.4)}
+.gym .tick{stroke:color-mix(in srgb,var(--paper) 14%,transparent);stroke-width:.9}
+.gym .mancal{fill:var(--ink);stroke:var(--paper);stroke-width:1.4}
+.gym .junta{fill:var(--ink-2);stroke:var(--paper);stroke-width:1.3}
+
+/* ── CartPole ──────────────────────────────────────────────────────────
+   A haste tomba e o carrinho corre PARA BAIXO dela para recuperar o
+   equilíbrio: é ele que corrige, não um enfeite acompanhando junto.      */
+.cart{
+  --osc:calc(sin(var(--q,0) * 17rad));
+  /* avanço curto (~34°), não os 90° do cosseno: com meia volta de defasagem
+     o carro aparecia do lado oposto ao tombo, como se fugisse da haste */
+  --avanco:calc(sin(var(--q,0) * 17rad + .6rad));
+  --amort:calc((1 - var(--q,0)) * (1 - var(--q,0)) * 1.6);
+}
+.cart .trilho{stroke:var(--line);stroke-width:1.6;stroke-linecap:round}
+.cart .tick-c{stroke:color-mix(in srgb,var(--paper) 26%,transparent)}
+.cart .env{
+  fill:none;stroke:var(--amber);stroke-width:.9;stroke-dasharray:2 3;
+  opacity:calc(var(--amort) * .35);
+}
+.cart .equil{
+  stroke:var(--cyan);stroke-width:.9;stroke-dasharray:2 2;
+  opacity:calc(clamp(0, calc((var(--q,0) - .70) * 4), 1) * .75);
+}
+.cart .carro{transform:translateX(calc(var(--avanco) * 17px * var(--amort)))}
+.cart .chassi{fill:color-mix(in srgb,var(--paper) 10%,transparent);stroke:var(--paper);stroke-width:1.4}
+.cart .roda{fill:var(--ink);stroke:var(--paper);stroke-width:1.3}
+.cart .cubo{fill:var(--paper)}
+.cart .haste,.cart .bob{
+  transform-origin:48px 39px;
+  transform:rotate(calc(var(--osc) * 19deg * var(--amort)));
+}
+.cart .haste{stroke:var(--amber);stroke-width:2;stroke-linecap:round}
+.cart .bob{fill:var(--amber);filter:drop-shadow(0 0 5px var(--amber))}
+
+/* ── Acrobot ───────────────────────────────────────────────────────────
+   Balanço em duas fases: o ato 2 joga o conjunto de lado ganhando inércia,
+   o ato 4 desdobra o segundo elo e a ponta cruza a linha alvo. Pivô em
+   (48,30) e elos de 12: no fim l1=180° e l2=20°, a ponta por volta de y=7,
+   acima do alvo (y=18) e ainda dentro do quadro.                          */
+.acro .susp{stroke:var(--line);stroke-width:1.6;stroke-linecap:round}
+.acro .alvo{stroke:var(--muted);stroke-width:.9;stroke-dasharray:3 3;opacity:.55}
+.acro .alvo-hit{
+  stroke:var(--amber);stroke-width:1.5;
+  opacity:clamp(0, calc((var(--a4) - .55) * 4), 1);
+  filter:drop-shadow(0 0 5px var(--amber));
+}
+.acro .acro-lbl{fill:var(--muted);font-family:var(--mono);font-size:4px;opacity:.65}
+.acro .arco{stroke:var(--cyan);stroke-width:1;fill:none;--dp:var(--e2);opacity:.48}
+.acro .elo{stroke:var(--paper);stroke-width:2;stroke-linecap:round;fill:none}
+.acro .elo2{stroke:var(--cyan)}
+.acro .l1{transform-origin:48px 30px;transform:rotate(calc(var(--e2) * 110deg + var(--e4) * 70deg))}
+.acro .l2{transform-origin:48px 42px;transform:rotate(calc(var(--e2) * -120deg + var(--e4) * 140deg))}
+.acro .ponta{fill:var(--cyan);filter:drop-shadow(0 0 6px var(--cyan))}
+
+/* ── LunarLander ───────────────────────────────────────────────────────
+   desce, freia com propulsão, toca o solo e as luzes da plataforma acendem */
+.lander .chao{stroke:var(--line);stroke-width:1.4}
+.lander .corpo{stroke:var(--paper);stroke-width:1.6;fill:none;stroke-linejoin:round}
+.lander .nave{transform:translateY(calc((1 - var(--e3)) * -40px))}
+.lander .fogo{
+  stroke:var(--amber);stroke-width:1.8;stroke-linecap:round;
+  transform-origin:48px 43px;
+  transform:scaleY(calc(.55 + sin(var(--q,0) * 30rad) * .35));
+  opacity:calc(clamp(0, calc((var(--a2) - .1) * 3), 1) * (1 - var(--a4)));
+}
+.lander .pad{stroke:var(--cyan);stroke-width:1.8;stroke-linecap:round}
+.lander .luz{fill:var(--cyan);filter:drop-shadow(0 0 4px var(--cyan))}
+.lander .lz1{opacity:clamp(0, calc((var(--a4) - .30) * 6), 1)}
+.lander .lz2{opacity:clamp(0, calc((var(--a4) - .45) * 6), 1)}
+.lander .poeira{
+  stroke:color-mix(in srgb,var(--paper) 34%,transparent);stroke-width:1;fill:none;
+  opacity:calc(clamp(0, calc((var(--a4) - .35) * 5), 1) * (1 - var(--a4)) * 2.2);
+  transform-origin:48px 47px;transform:scale(calc(.5 + var(--e4) * 1.4));
+}
+.lander .estrela{fill:color-mix(in srgb,var(--paper) 34%,transparent)}
+
+@media(prefers-reduced-motion:reduce){
+  [data-anim]{--q:.82}
+}

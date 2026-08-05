@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste de rolagem — o que o seu mouse envia</title>
+<style>
+  :root{
+    --ink:#080D18; --ink2:#0E1626; --line:#1C2942;
+    --paper:#E6ECF7; --muted:#8393B0; --amber:#FF9E2C; --cyan:#3FD0C9; --vermelho:#FF6B6B;
+    --mono:ui-monospace,"IBM Plex Mono",Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--paper);font:15px/1.6 system-ui,sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:2rem 1.25rem 6rem}
+  h1{font-size:1.5rem;margin:0 0 .3rem}
+  .sub{color:var(--muted);margin:0 0 2rem}
+  .grade{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  @media(min-width:700px){.grade{grid-template-columns:repeat(2,1fr)}}
+  .cel{background:var(--ink2);padding:1rem 1.1rem}
+  .rot{font:11px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .val{font:600 1.6rem/1.2 var(--mono);margin-top:.35rem}
+  .val small{font-size:.8rem;font-weight:400;color:var(--muted)}
+  .ok{color:var(--cyan)} .alerta{color:var(--amber)} .ruim{color:var(--vermelho)}
+
+  .painel{margin-top:2rem;border:1px solid var(--line);border-radius:6px;background:var(--ink2);padding:1.25rem}
+  .painel h2{font-size:1rem;margin:0 0 .2rem}
+  .painel p{color:var(--muted);margin:.2rem 0 1rem;font-size:.92rem}
+
+  .pista{position:relative;height:34px;background:var(--ink);border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:.5rem}
+  .barra{position:absolute;inset:0 auto 0 0;width:100%;transform-origin:left;transform:scaleX(0)}
+  .b-cru{background:linear-gradient(90deg,var(--vermelho),color-mix(in srgb,var(--vermelho) 40%,transparent))}
+  .b-mola{background:linear-gradient(90deg,var(--cyan),color-mix(in srgb,var(--cyan) 40%,transparent))}
+  .legenda{font:11px/1 var(--mono);color:var(--muted);margin-bottom:1rem}
+  .legenda i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:.35rem;vertical-align:-1px}
+
+  table{width:100%;border-collapse:collapse;font:12px/1.5 var(--mono);margin-top:.5rem}
+  th,td{text-align:right;padding:.4rem .5rem;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:500;text-align:right}
+  th:first-child,td:first-child{text-align:left}
+
+  .veredito{margin-top:2rem;border-left:3px solid var(--amber);background:var(--ink2);padding:1.1rem 1.25rem;border-radius:0 6px 6px 0}
+  .veredito h2{margin:0 0 .5rem;font-size:1rem}
+  .veredito ul{margin:.4rem 0 0;padding-left:1.1rem;color:var(--muted)}
+  .veredito li{margin:.35rem 0}
+  .copiar{margin-top:1.25rem;font:12px var(--mono);background:var(--ink);border:1px solid var(--line);
+          color:var(--paper);padding:.7rem 1rem;border-radius:4px;cursor:pointer}
+  .copiar:hover{border-color:var(--amber);color:var(--amber)}
+  .espaco{height:200vh}
+  .aviso{position:fixed;left:50%;translate:-50% 0;bottom:1.5rem;background:var(--amber);color:var(--ink);
+         font:600 13px var(--mono);padding:.7rem 1.2rem;border-radius:999px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>O que a sua roda de mouse envia</h1>
+  <p class="sub">Role a página com o mouse, do jeito que você rola normalmente. Devagar e depois rápido.
+     Os números abaixo são do <b>seu</b> equipamento, não do meu.</p>
+
+  <div class="grade">
+    <div class="cel"><div class="rot">Unidade que a roda reporta</div><div class="val" id="modo">—</div></div>
+    <div class="cel"><div class="rot">Passo por evento</div><div class="val" id="passo">—</div></div>
+    <div class="cel"><div class="rot">Eventos por segundo</div><div class="val" id="taxa">—</div></div>
+    <div class="cel"><div class="rot">Quadros por segundo</div><div class="val" id="fps">—</div></div>
+    <div class="cel"><div class="rot">Tipo de dispositivo</div><div class="val" id="tipo">—</div></div>
+    <div class="cel"><div class="rot">Movimento reduzido no sistema</div><div class="val" id="reduz">—</div></div>
+  </div>
+
+  <div class="painel">
+    <h2>Cru contra amortecido</h2>
+    <p>As duas barras seguem a mesma rolagem. A vermelha lê a posição direto — é o que dá a sensação
+       de pular. A ciano passa por uma mola antes, que é a correção aplicada no site.</p>
+    <div class="pista"><div class="barra b-cru" id="bCru"></div></div>
+    <div class="pista"><div class="barra b-mola" id="bMola"></div></div>
+    <div class="legenda">
+      <span><i style="background:#FF6B6B"></i>cru — pula junto com a roda</span> &nbsp;&nbsp;
+      <span><i style="background:#3FD0C9"></i>com mola — desliza</span>
+    </div>
+
+    <h2 style="margin-top:1.5rem">Últimos eventos da roda</h2>
+    <p>Se o passo for sempre igual, é roda com trava. Se variar muito, é touchpad de precisão.</p>
+    <table>
+      <thead><tr><th>#</th><th>deltaY</th><th>unidade</th><th>vira px</th><th>intervalo</th></tr></thead>
+      <tbody id="log"></tbody>
+    </table>
+  </div>
+
+  <div class="veredito">
+    <h2>Leitura automática</h2>
+    <ul id="diag"><li>Role a página para começar a medir.</li></ul>
+    <button class="copiar" id="copiar">Copiar resultado para me mandar</button>
+  </div>
+
+  <div class="espaco"></div>
+  <p style="color:var(--muted);text-align:center">Chegou ao fim. Role para cima e para baixo algumas vezes.</p>
+</div>
+
+<div class="aviso" id="aviso">Role com o mouse ↓</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ── captura da roda ── */
+  var eventos = [], ultimoT = 0, unidades = {0:'pixels', 1:'linhas', 2:'páginas'};
+  var totalEventos = 0, janela = [];
+
+  function emPixels(e) {
+    if (e.deltaMode === 1) return e.deltaY * 18;
+    if (e.deltaMode === 2) return e.deltaY * innerHeight;
+    return e.deltaY;
+  }
+
+  addEventListener('wheel', function (e) {
+    var agora = performance.now();
+    var intervalo = ultimoT ? agora - ultimoT : 0;
+    ultimoT = agora;
+    totalEventos++;
+    janela.push(agora);
+    while (janela.length && agora - janela[0] > 1000) janela.shift();
+
+    eventos.unshift({ d: e.deltaY, m: e.deltaMode, px: emPixels(e), dt: intervalo });
+    if (eventos.length > 8) eventos.pop();
+
+    $('modo').innerHTML = unidades[e.deltaMode] +
+      ' <small>(deltaMode ' + e.deltaMode + ')</small>';
+    $('modo').className = 'val ' + (e.deltaMode === 0 ? 'ok' : 'alerta');
+
+    var abs = Math.abs(emPixels(e));
+    $('passo').innerHTML = Math.round(abs) + ' <small>px</small>';
+    $('taxa').textContent = janela.length;
+
+    var linhas = eventos.map(function (v, i) {
+      return '<tr><td>' + (i + 1) + '</td><td>' + v.d.toFixed(1) + '</td><td>' +
+             unidades[v.m] + '</td><td>' + Math.round(v.px) + ' px</td><td>' +
+             (v.dt ? Math.round(v.dt) + ' ms' : '—') + '</td></tr>';
+    }).join('');
+    $('log').innerHTML = linhas;
+
+    /* roda com trava manda sempre o mesmo passo; touchpad varia */
+    var passos = eventos.map(function (v) { return Math.abs(v.px); });
+    var maior = Math.max.apply(null, passos), menor = Math.min.apply(null, passos);
+    var variacao = maior > 0 ? (maior - menor) / maior : 0;
+    if (eventos.length >= 4) {
+      var touchpad = variacao > 0.35 || janela.length > 25;
+      $('tipo').textContent = touchpad ? 'touchpad de precisão' : 'roda com trava';
+      $('tipo').className = 'val';
+    }
+    $('aviso').style.display = 'none';
+    avalia();
+  }, { passive: true });
+
+  /* ── fps ── */
+  var quadros = 0, t0 = performance.now(), fpsAtual = 0;
+  function conta(t) {
+    quadros++;
+    if (t - t0 >= 1000) {
+      fpsAtual = Math.round(quadros * 1000 / (t - t0));
+      $('fps').textContent = fpsAtual;
+      $('fps').className = 'val ' + (fpsAtual >= 50 ? 'ok' : fpsAtual >= 30 ? 'alerta' : 'ruim');
+      quadros = 0; t0 = t;
+    }
+    requestAnimationFrame(conta);
+  }
+  requestAnimationFrame(conta);
+
+  /* ── cru contra mola ── */
+  var alvo = 0, atual = 0;
+  function progresso() {
+    var max = document.documentElement.scrollHeight - innerHeight;
+    return max > 0 ? scrollY / max : 0;
+  }
+  function anima() {
+    alvo = progresso();
+    atual += (alvo - atual) * 0.085;
+    $('bCru').style.transform = 'scaleX(' + alvo.toFixed(4) + ')';
+    $('bMola').style.transform = 'scaleX(' + atual.toFixed(4) + ')';
+    requestAnimationFrame(anima);
+  }
+  requestAnimationFrame(anima);
+
+  /* ── leitura automática ── */
+  var reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('reduz').textContent = reduzido ? 'SIM' : 'não';
+  $('reduz').className = 'val ' + (reduzido ? 'alerta' : 'ok');
+
+  function avalia() {
+    var itens = [];
+    var e = eventos[0];
+    if (!e) return;
+
+    if (e.m !== 0)
+      itens.push('<b class="alerta">A roda reporta em ' + unidades[e.m] + ', não em pixels.</b> ' +
+        'Todo código que trata deltaY como pixel rola quase nada. O site já converte.');
+    else
+      itens.push('A roda reporta em pixels, que é o caso mais comum.');
+
+    if (fpsAtual && fpsAtual < 50)
+      itens.push('<b class="ruim">Só ' + fpsAtual + ' quadros por segundo.</b> ' +
+        'Abaixo de 50 nenhuma animação parece lisa, por melhor que seja o código. ' +
+        'A causa costuma ser aceleração de hardware desligada no Chrome ou driver de vídeo.');
+    else if (fpsAtual)
+      itens.push('Quadros em ' + fpsAtual + ' por segundo — folga suficiente para animar.');
+
+    if (reduzido)
+      itens.push('<b class="alerta">O Windows está com efeitos de animação desligados.</b> ' +
+        'Isso desliga a rolagem suave nativa do Chrome: a página passa a saltar de uma vez ' +
+        'a cada volta da roda. É a causa mais provável do "pula linha".');
+
+    var passo = Math.abs(e.px);
+    if (passo > 150)
+      itens.push('<b class="alerta">Cada volta anda ' + Math.round(passo) + 'px.</b> ' +
+        'Passo grande consome a animação rápido demais; o curso das cenas precisa acompanhar.');
+
+    $('diag').innerHTML = itens.map(function (i) { return '<li>' + i + '</li>'; }).join('');
+  }
+
+  $('copiar').addEventListener('click', function () {
+    var e = eventos[0] || {};
+    var txt = [
+      'unidade: ' + (unidades[e.m] || '?') + ' (deltaMode ' + e.m + ')',
+      'passo por evento: ' + Math.round(Math.abs(e.px || 0)) + ' px',
+      'eventos por segundo: ' + janela.length,
+      'fps: ' + fpsAtual,
+      'tipo: ' + $('tipo').textContent,
+      'movimento reduzido: ' + (reduzido ? 'SIM' : 'nao'),
+      'tela: ' + innerWidth + 'x' + innerHeight,
+      'navegador: ' + navigator.userAgent
+    ].join('\n');
+    navigator.clipboard.writeText(txt).then(function () {
+      $('copiar').textContent = 'copiado — cole na conversa';
+    }, function () {
+      prompt('Copie este texto:', txt);
+    });
+  });
+})();
+</script>
+</body>
+</html>

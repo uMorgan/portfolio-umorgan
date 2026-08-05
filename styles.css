@@ -1,0 +1,693 @@
+/* Registrar as variáveis de progresso como número faz o navegador saber
+   interpolá-las. Assim a suavização vira transition nativa, em vez de um laço
+   de requestAnimationFrame no JS — que trava se um quadro for descartado. */
+@property --p    { syntax:"<number>"; inherits:true; initial-value:0 }
+@property --q    { syntax:"<number>"; inherits:true; initial-value:0 }
+@property --draw { syntax:"<number>"; inherits:true; initial-value:0 }
+
+/* ── tokens + coisas que o Tailwind não expressa bem ── */
+:root{
+  --ink:#080D18; --ink-2:#0E1626; --line:#1C2942;
+  --paper:#E6ECF7; --muted:#8393B0;
+  --amber:#FF9E2C; --cyan:#3FD0C9;
+  --display:"Barlow Condensed",Impact,"Arial Narrow",sans-serif;
+  --body:"Chivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--paper);font-family:var(--body);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+/* Brilhos de fundo: pintados uma vez numa camada própria. Sem will-change o
+   navegador repintava essa área enorme junto com a rolagem. */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  transform:translateZ(0);
+  background:
+    radial-gradient(60rem 40rem at 82% -10%,rgba(255,158,44,.10),transparent 65%),
+    radial-gradient(52rem 38rem at 8% 46%,rgba(63,208,201,.09),transparent 62%);
+}
+h1,h2,h3{font-family:var(--display);text-transform:uppercase;line-height:.92;font-weight:700}
+.mono{font-family:var(--mono)}
+
+/* ── marca: chevron de prompt, tirado do logo ────────── */
+.mk{display:inline-flex;align-items:center;gap:.5rem;flex:none}
+.mk::before{
+  content:"";width:.4rem;height:.4rem;
+  border-right:2px solid var(--amber);border-bottom:2px solid var(--amber);
+  transform:rotate(-45deg) translate(-1px,-1px);
+}
+.mk::after{content:"";width:1.35rem;height:1px;background:var(--line)}
+.logo{height:1.6rem;width:auto;color:var(--paper)}
+.logo .chev{stroke:var(--amber)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:2px}
+
+/* ── abertura: a marca se monta e voa para a barra ──── */
+.intro{
+  position:fixed;inset:0;z-index:100;background:var(--ink);
+  display:grid;place-items:center;transition:opacity .45s ease;
+}
+.intro-logo{width:min(34vw,20rem);height:auto;color:var(--paper);overflow:visible}
+/* Cada peça entra do seu lado e se desenha; --i escalona em 70ms, dando a
+   leitura de montagem em vez de tudo surgir junto. */
+.intro .pc{
+  stroke-dasharray:var(--len,60);stroke-dashoffset:var(--len,60);
+  opacity:0;transform:translate(var(--dx),var(--dy));
+  animation:montar 1.05s cubic-bezier(.2,.75,.3,1) forwards;
+  animation-delay:calc(var(--i) * 135ms);
+}
+.intro .pc:first-child{stroke:var(--amber)}
+@keyframes montar{
+  from{stroke-dashoffset:var(--len,60);opacity:0;transform:translate(var(--dx),var(--dy))}
+  55% {opacity:1}
+  to  {stroke-dashoffset:0;opacity:1;transform:translate(0,0)}
+}
+/* O voo é aplicado pelo JS, que mede a posição real do logo na barra (FLIP),
+   então a marca pousa exatamente no lugar dela. */
+/* fio de carregamento sob a marca, some quando ela levanta voo */
+.intro-barra{
+  position:absolute;left:50%;translate:-50%;bottom:calc(50% - 5.5rem);
+  width:min(26vw,15rem);height:1px;background:var(--line);overflow:hidden;
+}
+.intro-barra i{
+  display:block;height:100%;width:100%;background:var(--amber);
+  transform-origin:left;transform:scaleX(0);
+  animation:carregar 2.1s cubic-bezier(.4,0,.2,1) forwards;
+}
+@keyframes carregar{to{transform:scaleX(1)}}
+.intro.voa .intro-barra{opacity:0;transition:opacity .3s ease}
+.intro.voa .intro-logo{transition:transform 1s cubic-bezier(.6,0,.2,1)}
+.intro.saiu{opacity:0;pointer-events:none}
+/* Versão curta para movimento reduzido: as peças ainda se desenham, mas sem
+   virem de longe e sem o voo até a barra. */
+.intro.curta .pc{
+  animation-duration:.6s;animation-delay:calc(var(--i) * 60ms);
+  /* !important porque --dx/--dy vêm inline no HTML e venceriam a regra: sem
+     isso as peças ainda viriam de longe justamente na versão contida. */
+  --dx:0px !important;--dy:0px !important;
+}
+.intro.curta .intro-barra i{animation-duration:.6s}
+
+/* ── cursor ──────────────────────────────────────────
+   Anel com leve atraso e ponto exato. O atraso vem de transition, não de
+   laço de quadro: assim segue funcionando mesmo se o rAF for estrangulado. */
+.cursor{position:fixed;left:0;top:0;z-index:90;pointer-events:none;opacity:0;
+        transition:opacity .25s ease}
+.cursor.ativo{opacity:1}
+.cursor i{
+  position:absolute;display:block;border-radius:50%;
+  transform:translate(var(--x,-100px),var(--y,-100px)) translate(-50%,-50%);
+}
+.cursor .anel{
+  width:2.4rem;height:2.4rem;border:2px solid var(--amber);
+  box-shadow:0 0 14px -2px var(--amber), inset 0 0 10px -6px var(--amber);
+  transition:transform .17s cubic-bezier(.2,.7,.3,1),width .22s ease,height .22s ease,
+             border-color .22s ease,background .22s ease;
+}
+.cursor .ponto{
+  width:6px;height:6px;background:var(--paper);
+  box-shadow:0 0 8px color-mix(in srgb,var(--paper) 70%,transparent);
+}
+.cursor.perto .anel{
+  width:4rem;height:4rem;
+  background:color-mix(in srgb,var(--amber) 16%,transparent);
+  box-shadow:0 0 26px -4px var(--amber), inset 0 0 16px -8px var(--amber);
+}
+.cursor.perto .ponto{background:var(--amber)}
+/* o cursor do sistema sai de cena: o nosso passa a ser O cursor */
+body.sem-cursor,body.sem-cursor *{cursor:none !important}
+.cursor.clique .anel{transform:translate(var(--x,-100px),var(--y,-100px)) translate(-50%,-50%) scale(.8)}
+@media(hover:none),(pointer:coarse){.cursor{display:none}
+  body.sem-cursor,body.sem-cursor *{cursor:auto !important}}
+@media(prefers-reduced-motion:reduce){.cursor .anel{transition:width .2s ease,height .2s ease}}
+
+/* realces de passagem do mouse */
+.scn,.gym > figure{transition:border-color .3s ease,background-color .3s ease}
+.scn:hover{border-color:color-mix(in srgb,var(--amber) 34%,var(--line))}
+.gym > figure:hover{background-color:color-mix(in srgb,var(--paper) 4%,var(--ink-2))}
+.links a,.topbar nav a{transition:color .2s ease,border-color .2s ease,background .2s ease,transform .2s ease}
+.links a:hover{transform:translateY(-2px)}
+#marca{transition:opacity .25s ease}
+#marca.esperando{opacity:0}
+/* A abertura roda mesmo com movimento reduzido: é curta, acontece uma vez e
+   não desloca conteúdo. Escondê-la por completo era o motivo de ela nunca
+   aparecer em máquinas com "efeitos de animação" desligado no Windows. */
+
+/* ── marca d'água ────────────────────────────────────
+   A mesma logo, grande e quase apagada, atrás de tudo. Fica presa à tela e
+   nunca captura clique. */
+.marca-fundo{
+  position:fixed;left:-9vw;bottom:-4vh;
+  width:min(38vw,32rem);height:auto;z-index:0;pointer-events:none;
+  color:color-mix(in srgb,var(--paper) 35%,transparent);opacity:.06;
+}
+.marca-fundo .chev{stroke:var(--amber);opacity:.7}
+@media(max-width:1023px){.marca-fundo{width:70vw;left:-20vw;opacity:.045}}
+
+/* ── cena 3D: pilha de camadas da arquitetura ───────── */
+.stage{perspective:1400px;perspective-origin:50% 45%}
+.stack{
+  position:relative;width:min(21rem,30vw);aspect-ratio:1;margin-inline:auto;
+  transform-style:preserve-3d;
+  transform:
+    rotateX(calc(62deg - var(--p,0) * var(--amp,1) * 26deg))
+    rotateZ(calc(-34deg + var(--p,0) * var(--amp,1) * 30deg + var(--mx,0) * 6deg))
+    rotateY(calc(var(--my,0) * -4deg));
+
+}
+.plane{
+  position:absolute;inset:0;border:1px solid var(--edge);border-radius:4px;
+  background:
+    linear-gradient(var(--gridline) 1px,transparent 1px) 0 0/2.5rem 2.5rem,
+    linear-gradient(90deg,var(--gridline) 1px,transparent 1px) 0 0/2.5rem 2.5rem,
+    var(--fill);
+  box-shadow:0 0 34px -20px var(--edge);
+  transform:translateZ(calc(var(--i) * (1.2rem + var(--p,0) * var(--amp,1) * 4.6rem)));
+  backface-visibility:hidden;
+}
+.plane::after{
+  content:attr(data-label);position:absolute;left:.9rem;bottom:.7rem;
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--edge);white-space:nowrap;
+  opacity:var(--p,0);transition:opacity .3s ease;
+}
+.plane .pip{
+  position:absolute;width:.5rem;height:.5rem;border-radius:50%;background:var(--edge);
+  box-shadow:0 0 12px var(--edge);
+}
+
+/* ── spine dos projetos ─────────────────────────────── */
+.spine,.spine-rail{position:absolute;left:0;top:.55rem;bottom:3rem;width:2px}
+.spine-rail{background:var(--line)}
+.spine{
+  background:linear-gradient(180deg,var(--amber),var(--cyan) 60%,var(--cyan));
+  transform-origin:top;transform:scaleY(var(--draw,0));
+}
+.node::before{
+  content:"";position:absolute;left:-.4rem;top:.4rem;width:13px;height:13px;border-radius:50%;
+  background:var(--ink);border:2px solid var(--line);
+  transition:border-color .45s,box-shadow .45s;
+}
+.lit .node::before{border-color:var(--c);box-shadow:0 0 0 5px color-mix(in srgb,var(--c) 16%,transparent)}
+
+/* ── reveal on scroll ───────────────────────────────── */
+.rise{opacity:0;transform:translateY(18px);transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1)}
+.rise.in{opacity:1;transform:none}
+.rise[data-d="1"]{transition-delay:.08s}
+.rise[data-d="2"]{transition-delay:.16s}
+.rise[data-d="3"]{transition-delay:.24s}
+
+.pulse{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--cyan) 55%,transparent)}50%{box-shadow:0 0 0 6px transparent}}
+
+/* telas estreitas: cena menor e menos inclinada, para caber com o texto */
+@media(max-width:1023px){
+  .stack{width:min(13rem,40vw)}
+  .plane{transform:translateZ(calc(var(--i) * (.7rem + var(--p,0) * 2.4rem)))}
+  .plane::after{font-size:.55rem}
+}
+
+/* Movimento reduzido: corta o que é autônomo (pulso, deslocamento dos blocos)
+   e diminui a amplitude da cena, mas mantém o efeito ligado ao scroll — ele
+   responde ao gesto do usuário, não se move sozinho. */
+@media(prefers-reduced-motion:reduce){
+  :root{--amp:.72}
+  html{scroll-behavior:auto}
+  .rise{transform:none;transition:opacity .4s ease}
+  .pulse{animation:none}
+}
+
+/* ── carrossel de stack (minimalista & técnico) ────────── */
+.carousel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--ink-2);
+  color: var(--paper);
+  cursor: pointer;
+  transition: all .25s cubic-bezier(.2,.7,.3,1);
+}
+.carousel-btn:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: color-mix(in srgb, var(--amber) 8%, var(--ink-2));
+}
+.carousel-btn:active {
+  transform: scale(.95);
+}
+
+.stack-tab {
+  border: 1px solid var(--line);
+  background: var(--ink-2);
+  color: var(--muted);
+  padding: 0.4rem 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all .25s ease;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: .74rem;
+}
+.stack-tab:hover {
+  border-color: color-mix(in srgb, var(--amber) 40%, var(--line));
+  color: var(--paper);
+}
+.stack-tab.active {
+  border-color: var(--amber);
+  background: color-mix(in srgb, var(--amber) 10%, var(--ink-2));
+  color: var(--amber);
+}
+
+.stack-card {
+  flex: 0 0 calc(33.333% - 0.75rem);
+  min-width: 260px;
+  max-width: 350px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background:
+    radial-gradient(120% 80% at 12% 0%, color-mix(in srgb, var(--card-color, var(--amber)) 6%, transparent), transparent 60%),
+    var(--ink-2);
+  padding: 1.35rem 1.35rem 1.2rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s ease-out, border-color .3s ease, box-shadow .3s ease, opacity .3s ease;
+  user-select: none;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+@media (max-width: 860px) {
+  .stack-card { flex: 0 0 calc(50% - 0.5rem); }
+}
+@media (max-width: 580px) {
+  .stack-card { flex: 0 0 100%; }
+}
+
+.stack-card:hover {
+  border-color: color-mix(in srgb, var(--card-color, var(--amber)) 55%, var(--line));
+  box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--card-color, var(--amber)) 20%, transparent);
+}
+
+.stack-card-code {
+  margin-top: 0.85rem;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+  background: var(--ink);
+  padding: 0.45rem 0.65rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  color: var(--paper);
+}
+
+.stack-icon-wrapper {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--card-color, var(--amber));
+  margin-bottom: 0.9rem;
+  transition: border-color .3s ease, color .3s ease;
+}
+.stack-card:hover .stack-icon-wrapper {
+  border-color: var(--card-color, var(--amber));
+}
+
+.stack-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line);
+  cursor: pointer;
+  transition: all .25s ease;
+}
+.stack-dot.active {
+  width: 20px;
+  border-radius: 3px;
+  background: var(--amber);
+}
+
+/* ── tabela de benchmark de RL ──────────────────────── */
+.table-container {
+  background-color: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1.5rem;
+  font-family: var(--mono);
+  margin-top: 2.5rem;
+}
+
+.table-subtitle {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-subtitle::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: var(--muted);
+  border-radius: 50%;
+}
+
+.benchmark-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--paper);
+  font-size: 0.82rem;
+}
+
+.benchmark-table th, 
+.benchmark-table td {
+  padding: 12px 16px;
+  text-align: right;
+  border-bottom: 1px solid var(--line);
+}
+
+.benchmark-table th.text-left, 
+.benchmark-table td.text-left {
+  text-align: left;
+}
+
+.benchmark-table th {
+  color: var(--muted);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+  background: var(--ink);
+}
+
+.benchmark-table .highlight {
+  background-color: color-mix(in srgb, var(--amber) 10%, transparent);
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.benchmark-table thead tr th.highlight {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.benchmark-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.benchmark-table tbody tr:last-child td.highlight {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.benchmark-table tr:hover td {
+  background-color: color-mix(in srgb, var(--paper) 3%, transparent);
+}
+
+/* ── contato estilo Awwwards ────────────────────────── */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  margin-top: 5rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+  }
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #10b981;
+}
+
+/* Links no padrão Awwwards */
+.aww-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--paper);
+  text-decoration: none;
+  font-size: 1.25rem;
+  transition: all 0.3s ease;
+}
+.aww-link:hover {
+  color: var(--amber);
+  padding-left: 0.5rem;
+}
+.aww-link .arrow {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.aww-link:hover .arrow {
+  transform: translate(4px, -4px);
+}
+
+/* Toast de notificação de cópia rápida */
+.toast-copy {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ink-2);
+  border: 1px solid var(--amber);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 9999px;
+  box-shadow: 0 10px 25px -5px rgba(255, 158, 44, 0.3);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast-copy.active {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── otimizações mobile & responsividade ────────────────── */
+@media (max-width: 768px) {
+  /* overflow-x: clip em vez de hidden evita quebrar o position: sticky no mobile */
+  body {
+    overflow-x: clip;
+  }
+  
+  /* Garante o curso necessário para a animação travar na tela no mobile exatamente como no desktop */
+  #scene {
+    height: calc(100vh + 500px);
+  }
+  
+  .stage {
+    margin-bottom: 1rem;
+  }
+  .stack {
+    width: min(13rem, 52vw);
+  }
+
+  /* No mobile, animação de subida instantânea ao entrar em tela */
+  .rise {
+    transition-delay: 0s !important;
+    transform: translateY(12px);
+  }
+
+  /* Esconder barra de rolagem horizontal em navegadores mobile */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Ajuste em tabelas e containers */
+  .table-container {
+    padding: 1.1rem 0.75rem;
+    border-radius: 6px;
+  }
+
+  .benchmark-table th, 
+  .benchmark-table td {
+    padding: 10px 8px;
+    font-size: 0.75rem;
+  }
+
+  /* Ajuste de tipografia em títulos hero */
+  .hero-title {
+    font-size: clamp(2.3rem, 10vw, 4.2rem) !important;
+  }
+
+  /* Links e botões de toque */
+  .aww-link {
+    font-size: 1.1rem;
+    padding: 1rem 0;
+  }
+
+  .stack-tab {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.7rem;
+  }
+}
+
+/* ── menu suspenso mobile (Awwwards Style) ──────────────── */
+.menu-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--ink-2);
+  cursor: pointer;
+  z-index: 50;
+  transition: border-color .25s ease, background .25s ease;
+}
+.menu-toggle:hover {
+  border-color: var(--amber);
+}
+
+.menu-toggle .bar {
+  display: block;
+  width: 1.2rem;
+  height: 2px;
+  background-color: var(--paper);
+  border-radius: 2px;
+  margin: 2px 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, background-color 0.25s ease;
+}
+
+/* Estado ativo do hambúrguer (vira um 'X' animado) */
+.menu-toggle.active {
+  border-color: var(--amber);
+  background: color-mix(in srgb, var(--amber) 12%, var(--ink-2));
+}
+.menu-toggle.active .bar-1 {
+  transform: translateY(6px) rotate(45deg);
+  background-color: var(--amber);
+}
+.menu-toggle.active .bar-2 {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+.menu-toggle.active .bar-3 {
+  transform: translateY(-6px) rotate(-45deg);
+  background-color: var(--amber);
+}
+
+/* Overlay do menu suspenso fullscreen */
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background: color-mix(in srgb, var(--ink) 96%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6rem 2rem 3rem;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-100%);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+}
+
+.mobile-menu-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Trava a rolagem da página quando o menu está aberto */
+body.menu-aberto {
+  overflow: hidden !important;
+}
+
+/* Links do menu mobile com animação escalonada */
+.mobile-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--paper);
+  text-decoration: none;
+  font-family: var(--display);
+  font-size: 1.65rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s ease;
+}
+
+.mobile-menu-overlay.active .mobile-link {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: calc(var(--i, 1) * 70ms);
+}
+
+.mobile-link:hover, .mobile-link.highlight {
+  color: var(--amber);
+}
+
+.mobile-link .arrow {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  opacity: 0.6;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.mobile-link:hover .arrow {
+  opacity: 1;
+  transform: translate(4px, -4px);
+}
+
+.mobile-menu-footer {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.4s ease 0.45s, transform 0.4s ease 0.45s;
+}
+.mobile-menu-overlay.active .mobile-menu-footer {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+
+
+

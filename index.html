@@ -1,0 +1,984 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>João Morgan — Programador Full Stack &amp; Engenheiro de Dados</title>
+<meta name="description" content="Programador Full Stack na Trads Corretora e Engenheiro de Software em João Pessoa, PB. Especialista em pipelines de ingestão, modelagem de banco e integrações.">
+
+<!-- OpenGraph / Social Sharing -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="João Morgan — Programador Full Stack &amp; Engenheiro de Dados">
+<meta property="og:description" content="Pipelines de ingestão de dados, modelagem PostgreSQL, desenvolvimento Full-Stack e Inteligência Artificial.">
+<meta property="og:image" content="assets/avatar.jpg">
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:title" content="João Morgan — Programador Full Stack">
+<meta property="twitter:description" content="Programador Full Stack na Trads Corretora &amp; Engenheiro de Dados.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Chivo:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css?v=1785876369">
+<link rel="stylesheet" href="scenes.css?v=1785876369">
+</head>
+<body class="antialiased">
+
+<!-- Cursor: anel com pequeno atraso + ponto exato. Só em ponteiro fino. -->
+<div id="cursor" class="cursor" aria-hidden="true"><i class="anel"></i><i class="ponto"></i></div>
+
+<!-- Abertura: as sete peças da marca se montam e a marca voa para a barra.
+     Some sozinha por temporizador de segurança, então nunca prende a página. -->
+<div id="intro" class="intro" aria-hidden="true">
+  <svg id="intro-logo" class="intro-logo" viewBox="0 0 78 44" fill="none"
+       stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <path class="pc" style="--i:0;--dx:-26px;--dy:0px"  d="M4 13 L13 22 L4 31"/>
+    <path class="pc" style="--i:1;--dx:-14px;--dy:12px" d="M23 15 V24"/>
+    <path class="pc" style="--i:2;--dx:0px;--dy:20px"   d="M23 24 a9.5 9.5 0 0 0 19 0"/>
+    <path class="pc" style="--i:3;--dx:10px;--dy:16px"  d="M42 24 V8"/>
+    <path class="pc" style="--i:4;--dx:16px;--dy:-14px" d="M42 8 L55.5 27"/>
+    <path class="pc" style="--i:5;--dx:22px;--dy:-14px" d="M55.5 27 L69 8"/>
+    <path class="pc" style="--i:6;--dx:30px;--dy:-6px"  d="M69 8 V34"/>
+  </svg>
+  <div class="intro-barra"><i></i></div>
+</div>
+
+<header class="sticky top-0 z-40 border-b border-[var(--line)] bg-[color-mix(in_srgb,var(--ink)_94%,transparent)] backdrop-blur-md">
+  <div class="mx-auto flex max-w-[1180px] items-center justify-between gap-4 px-5 py-3.5 sm:px-10">
+    <a href="#topo" id="marca" class="flex items-center gap-2.5 no-underline flex-none" aria-label="uMorgan, início">
+      <svg class="logo" viewBox="0 0 78 44" fill="none" stroke="currentColor" stroke-width="3.4"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path class="chev" d="M4 13 L13 22 L4 31"/>
+        <path d="M23 15 V24"/>
+        <path d="M23 24 a9.5 9.5 0 0 0 19 0"/>
+        <path d="M42 24 V8"/>
+        <path d="M42 8 L55.5 27"/>
+        <path d="M55.5 27 L69 8"/>
+        <path d="M69 8 V34"/>
+      </svg>
+      <span class="mono text-[.85rem] tracking-[.12em] text-[var(--paper)]">uMorgan</span>
+    </a>
+
+    <!-- Navigation Links Desktop -->
+    <nav class="mono hidden gap-6 text-[.74rem] uppercase tracking-[.12em] md:flex">
+      <a href="#sobre" class="text-[var(--muted)] no-underline transition hover:text-[var(--paper)]">Sobre</a>
+      <a href="#trajetoria" class="text-[var(--muted)] no-underline transition hover:text-[var(--paper)]">Trajetória</a>
+      <a href="#projetos" class="text-[var(--muted)] no-underline transition hover:text-[var(--paper)]">Projetos</a>
+      <a href="#tcc" class="text-[var(--muted)] no-underline transition hover:text-[var(--paper)]">TCC</a>
+      <a href="#stack-tech" class="text-[var(--muted)] no-underline transition hover:text-[var(--paper)]">Stack</a>
+      <a href="#contato" class="text-[var(--amber)] no-underline font-medium transition hover:text-[var(--paper)]">Contato</a>
+    </nav>
+
+    <!-- Botão Hambúrguer Animado Mobile -->
+    <button id="menu-toggle" class="menu-toggle md:hidden" aria-label="Abrir menu de navegação" aria-expanded="false">
+      <span class="bar bar-1"></span>
+      <span class="bar bar-2"></span>
+      <span class="bar bar-3"></span>
+    </button>
+  </div>
+</header>
+
+<!-- Menu Suspenso Mobile Fullscreen (Glassmorphic Overlay) -->
+<div id="mobile-menu" class="mobile-menu-overlay md:hidden" aria-hidden="true">
+  <div class="mobile-menu-content max-w-[400px]">
+    <span class="mono text-[.68rem] uppercase tracking-[.2em] text-[var(--amber)] mb-6 block">// NAVEGAÇÃO</span>
+    
+    <nav class="mobile-nav-links space-y-3">
+      <a href="#sobre" class="mobile-link" style="--i: 1">
+        <span class="mono text-[.72rem] text-[var(--amber)] mr-3">01.</span>
+        <span>SOBRE</span>
+        <span class="arrow">↗</span>
+      </a>
+      <a href="#trajetoria" class="mobile-link" style="--i: 2">
+        <span class="mono text-[.72rem] text-[var(--amber)] mr-3">02.</span>
+        <span>TRAJETÓRIA</span>
+        <span class="arrow">↗</span>
+      </a>
+      <a href="#projetos" class="mobile-link" style="--i: 3">
+        <span class="mono text-[.72rem] text-[var(--amber)] mr-3">03.</span>
+        <span>PROJETOS</span>
+        <span class="arrow">↗</span>
+      </a>
+      <a href="#tcc" class="mobile-link" style="--i: 4">
+        <span class="mono text-[.72rem] text-[var(--amber)] mr-3">04.</span>
+        <span>BENCHMARK TCC</span>
+        <span class="arrow">↗</span>
+      </a>
+      <a href="#stack-tech" class="mobile-link" style="--i: 5">
+        <span class="mono text-[.72rem] text-[var(--amber)] mr-3">05.</span>
+        <span>STACK TECNOLÓGICA</span>
+        <span class="arrow">↗</span>
+      </a>
+      <a href="#contato" class="mobile-link highlight" style="--i: 6">
+        <span class="mono text-[.72rem] text-[var(--amber)] mr-3">06.</span>
+        <span>CONTATO</span>
+        <span class="arrow">↗</span>
+      </a>
+    </nav>
+
+    <div class="mobile-menu-footer mt-8 pt-6 border-t border-[var(--line)] mono text-[.76rem] space-y-1.5">
+      <p class="text-[var(--paper)] font-medium">morgantaria965@gmail.com</p>
+      <p class="text-[var(--muted)]">João Pessoa, PB (BRT)</p>
+    </div>
+  </div>
+</div>
+
+<!-- marca d'água: a mesma logo, grande e quase apagada, ao fundo -->
+<svg class="marca-fundo" viewBox="0 0 78 44" fill="none" stroke="currentColor" stroke-width="2.6"
+     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path class="chev" d="M4 13 L13 22 L4 31"/>
+  <path d="M23 15 V24"/><path d="M23 24 a9.5 9.5 0 0 0 19 0"/><path d="M42 24 V8"/>
+  <path d="M42 8 L55.5 27"/><path d="M55.5 27 L69 8"/><path d="M69 8 V34"/>
+</svg>
+
+<main id="topo" class="relative z-10">
+
+  <!-- HERO + CENA 3D -->
+  <section id="scene" class="relative h-[calc(100vh+560px)]">
+    <div class="sticky top-0 flex h-screen items-center overflow-hidden">
+      <div class="mx-auto grid w-full max-w-[1180px] items-center gap-6 px-5 sm:px-10 lg:grid-cols-[1.05fr_.95fr] lg:gap-10">
+
+        <div>
+          <p class="mono flex flex-wrap items-center gap-3 text-[.7rem] uppercase tracking-[.18em] text-[var(--muted)]">
+            <span class="mk"></span>
+            João Morgan · João Pessoa, PB
+          </p>
+          <h1 class="mt-4 max-w-[13ch] text-[clamp(2.3rem,5.2vw,6rem)] tracking-tight lg:mt-6">
+            Construo a camada
+            <em class="block not-italic text-[var(--amber)]">que falta em<br>sistemas fechados.</em>
+          </h1>
+          <p class="mt-7 max-w-[46ch] text-[var(--muted)]">
+            Engenheiro de software e analista de dados. Trabalho com pipelines de ingestão,
+            modelagem de banco e dashboards sobre sistemas que não foram feitos para integrar.
+          </p>
+          <p class="mono mt-8 inline-flex items-center gap-2.5 rounded-full border border-[var(--line)] bg-[var(--ink-2)] px-4 py-2 text-[.74rem]">
+            <i class="pulse block h-[7px] w-[7px] rounded-full bg-[var(--cyan)]"></i>
+            Aberto a novas oportunidades
+          </p>
+        </div>
+
+        <div class="stage order-first lg:order-none" aria-hidden="true">
+          <div class="stack" id="stack">
+            <div class="plane" style="--i:3;--edge:var(--amber);--fill:color-mix(in srgb,var(--amber) 5%,transparent);--gridline:color-mix(in srgb,var(--amber) 9%,transparent)" data-label="01 · coleta">
+              <i class="pip" style="left:18%;top:26%"></i><i class="pip" style="left:64%;top:58%"></i>
+            </div>
+            <div class="plane" style="--i:2;--edge:color-mix(in srgb,var(--amber) 55%,var(--cyan));--fill:color-mix(in srgb,var(--amber) 3%,transparent);--gridline:color-mix(in srgb,var(--paper) 5%,transparent)" data-label="02 · banco"></div>
+            <div class="plane" style="--i:1;--edge:var(--cyan);--fill:color-mix(in srgb,var(--cyan) 4%,transparent);--gridline:color-mix(in srgb,var(--cyan) 8%,transparent)" data-label="03 · api"></div>
+            <div class="plane" style="--i:0;--edge:var(--paper);--fill:color-mix(in srgb,var(--paper) 4%,transparent);--gridline:color-mix(in srgb,var(--paper) 7%,transparent)" data-label="04 · interface">
+              <i class="pip" style="left:30%;top:44%"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SOBRE -->
+  <section id="sobre" class="border-t border-[var(--line)] py-28 sm:py-40">
+    <div class="mx-auto max-w-[1180px] px-5 sm:px-10">
+      <p class="mono flex items-center gap-3 text-[.7rem] uppercase tracking-[.18em] text-[var(--muted)]">
+        <span class="mk"></span> Sobre
+      </p>
+      <div class="mt-10 grid gap-10 md:grid-cols-[auto_1fr] md:gap-14">
+        <img src="assets/avatar.jpg" alt="João Morgan" width="140" height="140"
+             class="rise h-32 w-32 rounded-sm border border-[var(--line)] object-cover grayscale md:h-36 md:w-36">
+        <div class="rise" data-d="1">
+          <h2 class="max-w-[18ch] text-[clamp(1.8rem,4.5vw,2.8rem)]">Comecei pelo suporte,<br>não pelo código.</h2>
+          <div class="mt-6 grid max-w-[58ch] gap-4 text-[var(--muted)]">
+            <p>
+              Antes da faculdade eu já cuidava da TI da empresa da minha família: rede, servidores
+              e o chamado que aparece quando algo para. Nunca foi plano de carreira e nunca tomou o
+              lugar do estudo, mas foram anos convivendo com sistema em produção antes de eu
+              escrever um.
+            </p>
+            <p>
+              Entrei em Ciência da Computação na UEPB em 2021 e fui pesquisador no NUTES até 2023,
+              com tecnologia aplicada à saúde. Concluí a graduação no UNIPÊ.
+            </p>
+            <p class="border-l-2 border-[var(--amber)] pl-4 text-[var(--paper)]">
+              Hoje integro sistemas que não foram pensados para conversar entre si e transformo o
+              resultado em algo que a área de negócio usa sozinha.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAJETÓRIA -->
+  <section id="trajetoria" class="border-t border-[var(--line)] py-28 sm:py-40">
+    <div class="mx-auto max-w-[1180px] px-5 sm:px-10">
+      <p class="mono flex items-center gap-3 text-[.7rem] uppercase tracking-[.18em] text-[var(--muted)]">
+        <span class="mk"></span> Trajetória
+      </p>
+      <div class="mt-10 divide-y divide-[var(--line)] border-y border-[var(--line)]">
+        <div class="rise grid gap-2 py-6 md:grid-cols-[9rem_1fr_1.1fr] md:gap-6">
+          <p class="mono pt-1 text-[.74rem] text-[var(--cyan)]">2025 &ndash; hoje</p>
+          <div>
+            <h3 class="text-2xl">Desenvolvedor de Sistemas</h3>
+            <p class="mono mt-1 text-[.74rem] text-[var(--muted)]">Trads Corretora · efetivado em jul/2026, antes estagiário</p>
+          </div>
+          <p class="text-[.96rem] text-[var(--muted)]">
+            Pipelines de ingestão de eventos de CRM via webhook, com dead letter queue e workers.
+            Modelagem de banco, views materializadas e dashboards. Onboarding dos estagiários.
+          </p>
+        </div>
+        <div class="rise grid gap-2 py-6 md:grid-cols-[9rem_1fr_1.1fr] md:gap-6" data-d="1">
+          <p class="mono pt-1 text-[.74rem] text-[var(--amber)]">2021 &ndash; 2023</p>
+          <div>
+            <h3 class="text-2xl">Pesquisador em Inovação</h3>
+            <p class="mono mt-1 text-[.74rem] text-[var(--muted)]">NUTES / UEPB</p>
+          </div>
+          <p class="text-[.96rem] text-[var(--muted)]">Tecnologia aplicada à saúde.</p>
+        </div>
+        <div class="rise grid gap-2 py-6 md:grid-cols-[9rem_1fr_1.1fr] md:gap-6" data-d="2">
+          <p class="mono pt-1 text-[.74rem] text-[var(--amber)]">2017 &ndash; 2024</p>
+          <div>
+            <h3 class="text-2xl">TI e infraestrutura</h3>
+            <p class="mono mt-1 text-[.74rem] text-[var(--muted)]">JM Locações · empresa da família, em paralelo aos estudos</p>
+          </div>
+          <p class="text-[.96rem] text-[var(--muted)]">
+            Infraestrutura, redes e sistemas internos. Automação de processos e suporte de segundo e terceiro nível.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJETOS (linhagem) -->
+  <section id="projetos" class="border-t border-[var(--line)] py-28 sm:py-40">
+    <div class="mx-auto max-w-[1180px] px-5 sm:px-10">
+      <p class="mono flex items-center gap-3 text-[.7rem] uppercase tracking-[.18em] text-[var(--muted)]">
+        <span class="mk"></span> Projetos · dois sistemas ligados
+      </p>
+      <h2 class="mt-5 max-w-[18ch] text-[clamp(1.9rem,5vw,3.2rem)]">O segundo é o primeiro,<br>reconstruído.</h2>
+
+      <div class="relative mt-14" id="track">
+        <div class="spine-rail"></div><div class="spine" id="spine"></div>
+
+        <article class="proj rise relative pb-16 pl-9 sm:pl-16" style="--c:var(--amber)">
+          <span class="node absolute left-0 top-0"></span>
+          <p class="mono text-[.72rem] tracking-[.2em] text-[var(--c)]">01 &nbsp;/&nbsp; A base</p>
+          <h3 class="mt-3 max-w-[16ch] text-[clamp(1.7rem,4vw,2.6rem)]">Pipeline de ingestão de CRM</h3>
+          <p class="mono mt-3 text-[.74rem] text-[var(--muted)]">set/2025 · PHP, Python e Node</p>
+          <div class="mt-6 grid max-w-[58ch] gap-4">
+            <p class="text-[var(--muted)]">
+              A API devolvia 50 registros por chamada, aceitava duas por segundo e não dizia o que
+              tinha mudado. Recarregar 29 mil negócios levava horas e falhava no meio.
+            </p>
+            <p class="text-[var(--muted)]">
+              Tratei como diferença, não cópia. O sistema compara o estado atual com o anterior e
+              busca só o que mudou ou falta. O coletor trabalha por fila e retoma de onde parou.
+            </p>
+            <p class="border-l-2 border-[var(--c)] pl-4"><b class="font-medium text-[var(--c)]">Resultado:</b> cópia confiável do CRM, atualizada sozinha.</p>
+          </div>
+          <ul class="mono mt-7 flex flex-wrap gap-2 p-0 text-[.72rem]">
+            <li class="list-none rounded-sm border border-[var(--line)] bg-[var(--ink-2)] px-3 py-1.5 text-[var(--muted)]"><b class="font-medium text-[var(--paper)]">29 mil</b> negócios</li>
+            <li class="list-none rounded-sm border border-[var(--line)] bg-[var(--ink-2)] px-3 py-1.5 text-[var(--muted)]"><b class="font-medium text-[var(--paper)]">5</b> coletores</li>
+            <li class="list-none rounded-sm border border-[var(--line)] bg-[var(--ink-2)] px-3 py-1.5 text-[var(--muted)]">coleta <b class="font-medium text-[var(--paper)]">retomável</b></li>
+          </ul>
+
+          <div class="pin"><div class="pin-inner">
+          <div class="scn pipe max-w-[46rem]" data-anim aria-hidden="true">
+            <svg viewBox="0 0 300 92">
+              <defs>
+                <linearGradient id="beamFade" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3FD0C9" stop-opacity="0"/>
+                  <stop offset="100%" stop-color="#3FD0C9" stop-opacity=".55"/>
+                </linearGradient>
+              </defs>
+
+              <text x="2" y="7">estado atual · 29.412 negócios</text>
+              <rect class="frame" x="0" y="11" width="80" height="72" rx="3"/>
+
+              <rect class="reg" x="5" y="15" width="70" height="8" rx="2"/><text class="rid" x="8" y="20.6">#41209</text>
+              <rect class="reg" x="5" y="26" width="70" height="8" rx="2"/><text class="rid" x="8" y="31.6">#41210</text>
+              <rect class="reg chg c1" x="5" y="37" width="70" height="8" rx="2"/><text class="rid" x="8" y="42.6">#41211</text>
+              <text class="delta d1" x="66" y="42.8">Δ</text>
+              <rect class="reg" x="5" y="48" width="70" height="8" rx="2"/><text class="rid" x="8" y="53.6">#41212</text>
+              <rect class="reg chg c2" x="5" y="59" width="70" height="8" rx="2"/><text class="rid" x="8" y="64.6">#41213</text>
+              <text class="delta d2" x="66" y="64.8">Δ</text>
+              <rect class="reg" x="5" y="70" width="70" height="8" rx="2"/><text class="rid" x="8" y="75.6">#41214</text>
+
+              <rect class="beam-glow" x="1" y="4" width="78" height="11"/>
+              <line class="beam" x1="1" y1="15" x2="79" y2="15"/>
+
+              <path class="trail" d="M78 41 Q150 41 214 31 M78 63 Q150 63 214 42"/>
+              <rect class="fly f1" x="78" y="37" width="54" height="8" rx="2"/>
+              <rect class="fly f2" x="78" y="59" width="54" height="8" rx="2"/>
+
+              <text x="212" y="7">fila de coleta</text>
+              <rect class="qbox" x="212" y="11" width="86" height="13" rx="3"/>
+              <rect class="qfill" x="213.5" y="12.5" width="83" height="10" rx="2"/>
+              <line class="qtick" x1="233" y1="11" x2="233" y2="24"/>
+              <line class="qtick" x1="255" y1="11" x2="255" y2="24"/>
+              <line class="qtick" x1="277" y1="11" x2="277" y2="24"/>
+
+              <path class="ok" data-draw d="M213 55 l4 4 l7 -8"/>
+              <text class="qnum" x="226" y="59">2 coletados</text>
+              <text class="hint note" x="212" y="70">os outros 29.410 não</text>
+              <text class="hint note" x="212" y="78">foram nem tocados</text>
+              <text class="hint note" x="212" y="86">retoma daqui se cair</text>
+            </svg>
+            <span class="cap">diferença, não cópia</span>
+          </div>
+          </div></div>
+        </article>
+
+        <div class="rise mb-16 pl-9 sm:pl-16">
+          <div class="mono flex max-w-[46ch] flex-wrap items-center gap-3 rounded-sm border border-dashed border-[var(--line)] bg-gradient-to-r from-[color-mix(in_srgb,var(--amber)_6%,transparent)] to-transparent px-5 py-4 text-[.78rem] text-[var(--muted)]">
+            <span class="mk"></span>
+            <p class="m-0"><b class="font-medium text-[var(--paper)]">01 virou 02.</b> Ter o dado deixou de ser o problema.</p>
+          </div>
+        </div>
+
+        <article class="proj rise relative pl-9 sm:pl-16" style="--c:color-mix(in srgb,var(--amber) 45%,var(--cyan))">
+          <span class="node absolute left-0 top-0"></span>
+          <p class="mono text-[.72rem] tracking-[.2em] text-[var(--c)]">02 &nbsp;/&nbsp; A reconstrução</p>
+          <h3 class="mt-3 max-w-[16ch] text-[clamp(1.7rem,4vw,2.6rem)]">Plataforma de BI</h3>
+          <p class="mono mt-3 text-[.74rem] text-[var(--muted)]">mai&ndash;jul/2026 · três serviços · 550 commits · em produção</p>
+          <div class="mt-6 grid max-w-[58ch] gap-4">
+            <p class="text-[var(--muted)]">
+              Cada gestor queria um recorte diferente e cada pedido virava código novo. Os painéis
+              anteriores eram rígidos: mudar uma métrica significava reescrever SQL na mão.
+            </p>
+            <p class="text-[var(--muted)]">
+              Reescrevi em três serviços ligados por um contrato de banco versionado. O gestor monta
+              a própria métrica e ela vira consulta real, em conexão só de leitura.
+            </p>
+            <p class="border-l-2 border-[var(--c)] pl-4"><b class="font-medium text-[var(--c)]">Resultado:</b> painel novo deixou de ser tarefa de desenvolvedor.</p>
+          </div>
+          <ul class="mono mt-7 flex flex-wrap gap-2 p-0 text-[.72rem]">
+            <li class="list-none rounded-sm border border-[var(--line)] bg-[var(--ink-2)] px-3 py-1.5 text-[var(--muted)]"><b class="font-medium text-[var(--paper)]">550</b> commits</li>
+            <li class="list-none rounded-sm border border-[var(--line)] bg-[var(--ink-2)] px-3 py-1.5 text-[var(--muted)]"><b class="font-medium text-[var(--paper)]">3</b> serviços</li>
+            <li class="list-none rounded-sm border border-[var(--line)] bg-[var(--ink-2)] px-3 py-1.5 text-[var(--muted)]">painéis <b class="font-medium text-[var(--paper)]">sem código</b></li>
+          </ul>
+
+          <div class="pin"><div class="pin-inner">
+          <div class="scn bi max-w-[46rem]" data-anim aria-hidden="true">
+            <svg viewBox="0 0 300 100">
+              <!-- 1 · prateleira de campos · 2 · o gestor monta · 3 · vira SQL
+                   real em conexão só-leitura · 4 · o painel se desenha -->
+              <text x="2" y="8">campos disponíveis</text>
+              <g class="chips">
+                <g class="chip ch1"><rect x="2"  y="13" width="44" height="11" rx="5.5"/><text x="9"  y="20.6">etapa</text></g>
+                <g class="chip ch2"><rect x="2"  y="28" width="44" height="11" rx="5.5"/><text x="9"  y="35.6">executivo</text></g>
+                <g class="chip ch3"><rect x="2"  y="43" width="44" height="11" rx="5.5"/><text x="9"  y="50.6">mês</text></g>
+                <g class="chip ch4"><rect x="2"  y="58" width="44" height="11" rx="5.5"/><text x="9"  y="65.6">valor</text></g>
+              </g>
+
+              <rect class="mesa" x="62" y="10" width="88" height="62" rx="5"/>
+              <text class="mesa-lbl" x="66" y="8">montagem</text>
+              <line class="mesa-div" x1="62" y1="34" x2="150" y2="34"/>
+              <text class="mesa-hint" x="68" y="26">agrupar por</text>
+              <text class="mesa-hint" x="68" y="47">somar</text>
+
+              <rect class="sql" x="162" y="10" width="136" height="30" rx="4"/>
+              <text class="sql-txt s-a" x="168" y="21">SELECT executivo, sum(valor)</text>
+              <text class="sql-txt s-b" x="168" y="30">FROM deals GROUP BY 1</text>
+              <text class="ro" x="168" y="37">conexão somente leitura</text>
+
+              <line class="axis" x1="164" y1="92" x2="296" y2="92" data-draw/>
+              <rect class="bar b1" x="172" y="62" width="18" height="30" rx="2"/>
+              <rect class="bar b2" x="198" y="52" width="18" height="40" rx="2"/>
+              <rect class="bar b3" x="224" y="70" width="18" height="22" rx="2"/>
+              <rect class="bar b4" x="250" y="58" width="18" height="34" rx="2"/>
+              <text class="val v1" x="172" y="59">31</text>
+              <text class="val v2" x="198" y="49">47</text>
+              <text class="val v3" x="224" y="67">22</text>
+              <text class="val v4" x="250" y="55">38</text>
+              <text class="hint note" x="164" y="99">painel pronto · nenhuma linha de código</text>
+            </svg>
+            <span class="cap">contrato versionado</span>
+          </div>
+          </div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCADOR -->
+  <section class="border-t border-[var(--line)] py-28 sm:py-40">
+    <div class="mx-auto max-w-[1180px] px-5 sm:px-10">
+      <p class="mono flex items-center gap-3 text-[.7rem] uppercase tracking-[.18em] text-[var(--muted)]">
+        <span class="mk"></span> Projeto separado
+      </p>
+      <h2 class="mt-5 text-[clamp(1.9rem,5vw,3.2rem)]">Discador integrado ao CRM</h2>
+      <div class="rise mt-8 rounded-sm border border-[var(--line)] border-l-2 border-l-[var(--cyan)] bg-gradient-to-b from-[color-mix(in_srgb,var(--cyan)_5%,transparent)] to-transparent p-6 sm:p-10" style="--c:var(--cyan)">
+        <p class="mono text-[.74rem] text-[var(--muted)]">jul/2026 · telefonia no navegador · voz, transcrição e resumo</p>
+        <div class="mt-6 grid max-w-[58ch] gap-4">
+          <p class="text-[var(--muted)]">
+            O time ligava por um aplicativo separado do sistema onde o negócio estava registrado.
+            O registro só existia se alguém digitasse um resumo depois, o que quase nunca acontecia.
+          </p>
+          <p class="text-[var(--muted)]">
+            Coloquei o discador dentro da própria tela do negócio. Ao desligar, o sistema busca a
+            gravação, transcreve, resume e publica ali mesmo com o áudio anexado.
+          </p>
+          <p class="border-l-2 border-[var(--cyan)] pl-4"><b class="font-medium text-[var(--cyan)]">Resultado:</b> o registro parou de depender de alguém lembrar.</p>
+        </div>
+
+        <div class="pin"><div class="pin-inner">
+        <div class="scn dial max-w-[46rem]" data-anim aria-hidden="true">
+          <svg viewBox="0 0 300 110">
+            <!-- aparelho que disca -->
+            <rect class="fone" x="6" y="6" width="54" height="98" rx="8"/>
+            <rect class="tela" x="12" y="13" width="42" height="14" rx="2.5"/>
+            <text class="dig n1" x="16" y="24">5</text>
+            <text class="dig n2" x="25" y="24">5</text>
+            <text class="dig n3" x="34" y="24">8</text>
+            <text class="dig n4" x="43" y="24">3</text>
+            <rect class="caret" x="52" y="16" width="1.2" height="8"/>
+
+            <rect class="k" x="13" y="33" width="12" height="10" rx="2.5"/>
+            <rect class="k" x="27" y="33" width="12" height="10" rx="2.5"/>
+            <rect class="k" x="41" y="33" width="12" height="10" rx="2.5"/>
+            <rect class="k" x="13" y="46" width="12" height="10" rx="2.5"/>
+            <rect class="k" x="27" y="46" width="12" height="10" rx="2.5"/>
+            <rect class="k" x="41" y="46" width="12" height="10" rx="2.5"/>
+            <rect class="k" x="13" y="59" width="12" height="10" rx="2.5"/>
+            <rect class="k" x="27" y="59" width="12" height="10" rx="2.5"/>
+            <rect class="k" x="41" y="59" width="12" height="10" rx="2.5"/>
+            <!-- realces: 5 (centro), 5, 8 (baixo-meio), 3 (topo-direita) -->
+            <rect class="kh h1" x="27" y="46" width="12" height="10" rx="2.5"/>
+            <rect class="kh h2" x="27" y="46" width="12" height="10" rx="2.5"/>
+            <rect class="kh h3" x="27" y="59" width="12" height="10" rx="2.5"/>
+            <rect class="kh h4" x="41" y="33" width="12" height="10" rx="2.5"/>
+
+            <rect class="btn" x="16" y="76" width="34" height="12" rx="6"/>
+            <path class="btn-ic" d="M25 82.5 q2-3 4 0 M31 79.5 l4 3 l-4 3"/>
+
+            <!-- a chamada atravessando -->
+            <path class="link" data-draw d="M64 55 H134"/>
+            <circle class="sinal" cx="66" cy="55" r="2.8"/>
+
+            <!-- aparelho que toca -->
+            <rect class="fone" x="140" y="30" width="36" height="52" rx="7"/>
+            <rect class="tela" x="145" y="36" width="26" height="8" rx="1.5"/>
+            <circle class="ring r1" cx="158" cy="56" r="16"/>
+            <circle class="ring r2" cx="158" cy="56" r="16"/>
+            <circle class="ring r3" cx="158" cy="56" r="16"/>
+            <text class="atendeu" x="144" y="94">atendida</text>
+
+            <!-- áudio vira texto e o texto vira comentário no card -->
+            <!-- quadráticas explícitas e alternadas: a cadeia de "t" reflete o
+                 ponto de controle a cada segmento e produzia uma lente (amplitude
+                 crescendo e voltando a zero), não uma onda constante -->
+            <path class="onda" data-draw d="M186 40 q4 -7 8 0 q4 7 8 0 q4 -7 8 0 q4 7 8 0 q4 -7 8 0 q4 7 8 0 q4 -7 8 0 q4 7 8 0 q4 -7 8 0 q4 7 8 0 q4 -7 8 0 q4 7 8 0 q4 -7 8 0 q4 7 8 0"/>
+            <rect class="card" data-draw x="184" y="50" width="112" height="52" rx="4"/>
+            <rect class="linha t1" x="190" y="58" width="98" height="3" rx="1.5"/>
+            <rect class="linha t2" x="190" y="66" width="80" height="3" rx="1.5"/>
+            <rect class="linha t3" x="190" y="74" width="90" height="3" rx="1.5"/>
+            <text class="hint note" x="190" y="90">resumo + áudio no card</text>
+          </svg>
+          <span class="cap">disca · conecta · transcreve</span>
+        </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TCC -->
+  <section id="tcc" class="border-t border-[var(--line)] py-28 sm:py-40">
+    <div class="mx-auto max-w-[1180px] px-5 sm:px-10">
+      <p class="mono flex items-center gap-3 text-[.7rem] uppercase tracking-[.18em] text-[var(--muted)]">
+        <span class="mk"></span> Trabalho de conclusão de curso
+      </p>
+      <h2 class="mt-5 max-w-[22ch] text-[clamp(1.9rem,5vw,3.2rem)]">Comparando três algoritmos de aprendizado por reforço.</h2>
+
+      <div class="rise mt-8 rounded-sm border border-[var(--line)] border-l-2 border-l-[var(--amber)] bg-gradient-to-b from-[color-mix(in_srgb,var(--amber)_5%,transparent)] to-transparent p-6 sm:p-10">
+        <p class="mono text-[.74rem] text-[var(--muted)]">
+          2025 · Python, Gymnasium, Stable-Baselines3 e PyTorch ·
+          <a href="https://github.com/uMorgan/ML-CD" rel="noopener" class="text-[var(--muted)] underline underline-offset-4 transition hover:text-[var(--amber)]">github.com/uMorgan/ML-CD</a>
+        </p>
+        <div class="mt-6 grid max-w-[58ch] gap-4">
+          <p class="text-[var(--muted)]">
+            Comparei DQN, A2C e PPO em três tarefas de controle: equilibrar um pêndulo, balançar um
+            pêndulo duplo e pousar uma nave.
+          </p>
+          <p class="text-[var(--muted)]">
+            O trabalho maior não foi treinar, foi garantir que a comparação fosse justa. Mesmo
+            protocolo e quatro critérios definidos antes de rodar.
+          </p>
+          <p class="border-l-2 border-[var(--amber)] pl-4"><b class="font-medium text-[var(--amber)]">Conclusão:</b> o PPO ficou à frente nos três e teve o menor desvio em todos.</p>
+        </div>
+
+        <div class="pin"><div class="pin-inner">
+        <div class="gym mt-8" data-anim aria-hidden="true">
+          <figure>
+            <svg class="cart" viewBox="0 0 96 58">
+              <!-- envelope da oscilação inicial, some conforme estabiliza -->
+              <path class="env" d="M31 18 A22 22 0 0 1 65 18"/>
+              <line class="equil" x1="48" y1="9" x2="48" y2="38"/>
+              <line class="trilho" x1="6" y1="50" x2="90" y2="50"/>
+              <line class="tick" x1="18" y1="50" x2="18" y2="53.5"/>
+              <line class="tick" x1="33" y1="50" x2="33" y2="53.5"/>
+              <line class="tick tick-c" x1="48" y1="50" x2="48" y2="55"/>
+              <line class="tick" x1="63" y1="50" x2="63" y2="53.5"/>
+              <line class="tick" x1="78" y1="50" x2="78" y2="53.5"/>
+              <!-- haste, bob e mancal moram DENTRO do grupo do carrinho: fora
+                   dele só girariam, sem acompanhar a translação, e a haste
+                   parecia flutuar solta do carrinho -->
+              <g class="carro">
+                <rect class="chassi" x="36" y="39" width="24" height="9" rx="2.5"/>
+                <circle class="roda" cx="42" cy="48" r="2.6"/>
+                <circle class="roda" cx="54" cy="48" r="2.6"/>
+                <circle class="cubo" cx="42" cy="48" r=".9"/>
+                <circle class="cubo" cx="54" cy="48" r=".9"/>
+                <line class="haste" x1="48" y1="39" x2="48" y2="15"/>
+                <circle class="bob" cx="48" cy="14" r="3"/>
+                <circle class="mancal" cx="48" cy="39" r="2"/>
+              </g>
+            </svg>
+            <figcaption>CartPole <b>equilibrou</b></figcaption>
+          </figure>
+          <figure>
+            <svg class="acro" viewBox="0 0 96 58">
+              <line class="alvo" x1="12" y1="18" x2="84" y2="18"/>
+              <line class="alvo-hit" x1="12" y1="18" x2="84" y2="18"/>
+              <text class="acro-lbl" x="12" y="14">altura alvo</text>
+              <!-- rastro do balanço, desenhado conforme o impulso cresce -->
+              <path class="arco" data-draw d="M24 42 a24 24 0 0 1 48 0"/>
+              <!-- mancal fixo no teto da cena -->
+              <line class="susp" x1="41" y1="26" x2="55" y2="26"/>
+              <line class="susp" x1="48" y1="26" x2="48" y2="30"/>
+              <circle class="mancal" cx="48" cy="30" r="2.2"/>
+              <g class="l1">
+                <line class="elo" x1="48" y1="30" x2="48" y2="42"/>
+                <circle class="junta" cx="48" cy="42" r="2"/>
+                <g class="l2">
+                  <line class="elo elo2" x1="48" y1="42" x2="48" y2="54"/>
+                  <circle class="ponta" cx="48" cy="54" r="2.8"/>
+                </g>
+              </g>
+            </svg>
+            <figcaption>Acrobot <b>alcançou</b></figcaption>
+          </figure>
+          <figure>
+            <svg class="lander" viewBox="0 0 96 58">
+              <circle class="estrela" cx="14" cy="12" r=".9"/>
+              <circle class="estrela" cx="78" cy="9" r=".7"/>
+              <circle class="estrela" cx="66" cy="20" r=".6"/>
+              <circle class="estrela" cx="24" cy="24" r=".7"/>
+              <line class="chao" x1="6" y1="50" x2="90" y2="50"/>
+              <line class="pad" x1="36" y1="50" x2="60" y2="50"/>
+              <circle class="luz lz1" cx="36" cy="50" r="1.5"/>
+              <circle class="luz lz2" cx="60" cy="50" r="1.5"/>
+              <path class="poeira" d="M38 47 q10 5 20 0"/>
+              <g class="nave">
+                <path class="corpo" d="M42 42 L42 34 L48 29 L54 34 L54 42 Z"/>
+                <line class="corpo" x1="42" y1="42" x2="38" y2="49"/>
+                <line class="corpo" x1="54" y1="42" x2="58" y2="49"/>
+                <line class="corpo" x1="36" y1="49" x2="40" y2="49"/>
+                <line class="corpo" x1="56" y1="49" x2="60" y2="49"/>
+                <line class="fogo" x1="48" y1="43" x2="48" y2="52"/>
+              </g>
+            </svg>
+            <figcaption>LunarLander <b>pousou</b></figcaption>
+          </figure>
+        </div>
+        </div></div>
+
+        <!-- TABELA DE RESULTADOS DO TCC (Benchmark RL) -->
+        <div class="table-container shadow-xl">
+          <p class="table-subtitle">Recompensa média e desvio padrão (10 episódios)</p>
+
+          <div class="overflow-x-auto">
+            <table class="benchmark-table">
+              <thead>
+                <tr>
+                  <th class="text-left">AMBIENTE</th>
+                  <th>DQN</th>
+                  <th>A2C</th>
+                  <th class="highlight">PPO</th>
+                </tr>
+              </thead>
+              <tbody class="tabular-nums">
+                <tr>
+                  <td class="text-left font-bold font-medium text-[var(--paper)]">CartPole</td>
+                  <td>475,2</td>
+                  <td>482,7</td>
+                  <td class="highlight font-bold">495,8</td>
+                </tr>
+                <tr>
+                  <td class="text-left font-bold font-medium text-[var(--paper)]">Acrobot</td>
+                  <td>&minus;85,3</td>
+                  <td>&minus;82,7</td>
+                  <td class="highlight font-bold">&minus;78,5</td>
+                </tr>
+                <tr>
+                  <td class="text-left font-bold font-medium text-[var(--paper)]">LunarLander</td>
+                  <td>185,3</td>
+                  <td>192,7</td>
+                  <td class="highlight font-bold">198,5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  <!-- STACK TECNOLÓGICA (Carrossel Interativo Aprimorado) -->
+  <section id="stack-tech" class="border-t border-[var(--line)] py-24 sm:py-36 relative overflow-hidden">
+    <div class="mx-auto max-w-[1180px] px-5 sm:px-10">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <p class="mono flex items-center gap-3 text-[.7rem] uppercase tracking-[.18em] text-[var(--muted)]">
+            <span class="mk"></span> Stack & Ferramentas
+          </p>
+          <h2 class="mt-4 max-w-[20ch] text-[clamp(1.9rem,4.5vw,3rem)]">
+            Tecnologias aplicadas<br>
+            <em class="not-italic text-[var(--amber)]">em sistemas de produção.</em>
+          </h2>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center gap-3">
+          <button id="stack-prev" class="carousel-btn" aria-label="Tecnologia anterior" title="Anterior">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button id="stack-next" class="carousel-btn" aria-label="Próxima tecnologia" title="Próximo">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Categories Filter Tabs -->
+      <div class="mt-8 flex flex-wrap gap-2 mono text-[.74rem]" id="stack-tabs">
+        <button class="stack-tab active" data-cat="all">Todas (10)</button>
+        <button class="stack-tab" data-cat="backend">Backend & Ingestão</button>
+        <button class="stack-tab" data-cat="database">Banco & BI</button>
+        <button class="stack-tab" data-cat="devops">DevOps & Infra</button>
+        <button class="stack-tab" data-cat="ai">IA & Data Science</button>
+        <button class="stack-tab" data-cat="frontend">Frontend & Web</button>
+      </div>
+
+      <!-- Carousel Viewport & Track -->
+      <div class="relative mt-8 overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--ink-2)]/60 p-5 sm:p-7 backdrop-blur-md shadow-2xl">
+        <!-- Glow accents behind carousel -->
+        <div class="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-[var(--amber)]/10 blur-3xl" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-[var(--cyan)]/10 blur-3xl" aria-hidden="true"></div>
+
+        <div id="stack-carousel-track" class="flex gap-4 transition-transform duration-500 ease-out cursor-grab active:cursor-grabbing">
+          
+          <!-- Card 1: Python -->
+          <div class="stack-card rise" data-cat="backend ai" style="--card-color: var(--amber)">
+            <div class="stack-icon-wrapper">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2c-4 0-5 1.8-5 3.5v2.5h5v1H5c-1.8 0-3 1.2-3 3s1.2 3 3 3h2v-2.5c0-1.8 1.2-3 3-3h5V7c0-1.7-1.2-5-5-5z"/>
+                <path d="M12 22c4 0 5-1.8 5-3.5v-2.5h-5v-1h7c1.8 0 3-1.2 3-3s-1.2-3-3-3h-2v2.5c0 1.8-1.2 3-3 3h-5v2.5c0 1.7 1.2 5 5 5z"/>
+                <circle cx="9" cy="5" r="0.75" fill="currentColor"/>
+                <circle cx="15" cy="19" r="0.75" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="mono text-[.68rem] uppercase tracking-wider text-[var(--card-color)]">Backend & ML</span>
+            <h3 class="text-xl font-bold mt-1 text-[var(--paper)]">Python</h3>
+            <p class="mt-2 text-[.85rem] text-[var(--muted)] line-clamp-3">
+              Pipelines de ingestão assíncrona, coletores com tratamento de falhas e experimentos de aprendizado por reforço.
+            </p>
+            <div class="stack-card-code">
+              <span class="text-[var(--muted)] opacity-60">$ </span><span class="text-[var(--amber)]">async def</span> <span class="text-[var(--paper)]">fetch_cdc</span>(evt_id):
+            </div>
+            <div class="mono mt-4 flex flex-wrap gap-1.5 text-[.68rem]">
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">FastAPI</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Asyncio</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">ETL</span>
+            </div>
+          </div>
+
+          <!-- Card 2: PostgreSQL -->
+          <div class="stack-card rise" data-cat="database" style="--card-color: var(--cyan)" data-d="1">
+            <div class="stack-icon-wrapper">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="6" rx="8" ry="3"/>
+                <path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/>
+                <path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/>
+              </svg>
+            </div>
+            <span class="mono text-[.68rem] uppercase tracking-wider text-[var(--card-color)]">Banco de Dados</span>
+            <h3 class="text-xl font-bold mt-1 text-[var(--paper)]">PostgreSQL</h3>
+            <p class="mt-2 text-[.85rem] text-[var(--muted)] line-clamp-3">
+              Modelagem relacional, views materializadas, rotinas de limpeza e contratos de conexão para plataformas de BI.
+            </p>
+            <div class="stack-card-code">
+              <span class="text-[var(--cyan)]">CREATE MATERIALIZED VIEW</span> mv_deals
+            </div>
+            <div class="mono mt-4 flex flex-wrap gap-1.5 text-[.68rem]">
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Views Materializadas</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Índices</span>
+            </div>
+          </div>
+
+          <!-- Card 3: PHP -->
+          <div class="stack-card rise" data-cat="backend" style="--card-color: #8892BF" data-d="2">
+            <div class="stack-icon-wrapper">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="3"/>
+                <path d="M6 9v6M6 12h3a1.5 1.5 0 0 0 0-3H6"/>
+                <path d="M12 9v6M12 12h3"/>
+                <path d="M18 9v6M18 12h3a1.5 1.5 0 0 0 0-3h-3"/>
+              </svg>
+            </div>
+            <span class="mono text-[.68rem] uppercase tracking-wider text-[var(--card-color)]">Integradores</span>
+            <h3 class="text-xl font-bold mt-1 text-[var(--paper)]">PHP</h3>
+            <p class="mt-2 text-[.85rem] text-[var(--muted)] line-clamp-3">
+              Captura de webhooks de CRM, integradores de chamadas telefônicas e serviços legados de alta concorrência.
+            </p>
+            <div class="stack-card-code">
+              <span class="text-[#8892BF]">$webhook</span>->dispatch(<span class="text-[var(--paper)]">$event_payload</span>);
+            </div>
+            <div class="mono mt-4 flex flex-wrap gap-1.5 text-[.68rem]">
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Webhooks</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">APIs REST</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Node.js -->
+          <div class="stack-card rise" data-cat="backend frontend" style="--card-color: #68A063">
+            <div class="stack-icon-wrapper">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z"/>
+                <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                <path d="M12 2v10M12 12l7.5 4.5"/>
+              </svg>
+            </div>
+            <span class="mono text-[.68rem] uppercase tracking-wider text-[var(--card-color)]">Workers & Runtime</span>
+            <h3 class="text-xl font-bold mt-1 text-[var(--paper)]">Node.js</h3>
+            <p class="mt-2 text-[.85rem] text-[var(--muted)] line-clamp-3">
+              Workers de fila em tempo real, rotinas de eventos de CRM e barramentos de mensageria assíncrona.
+            </p>
+            <div class="stack-card-code">
+              worker.<span class="text-[#68A063]">process</span>(<span class="text-[var(--amber)]">async</span> (job) => {...});
+            </div>
+            <div class="mono mt-4 flex flex-wrap gap-1.5 text-[.68rem]">
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Workers</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Event Loop</span>
+            </div>
+          </div>
+
+          <!-- Card 5: Docker & Linux -->
+          <div class="stack-card rise" data-cat="devops" style="--card-color: #38BDF8">
+            <div class="stack-icon-wrapper">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="4" height="3" rx="0.5"/>
+                <rect x="8" y="11" width="4" height="3" rx="0.5"/>
+                <rect x="13" y="11" width="4" height="3" rx="0.5"/>
+                <rect x="8" y="7" width="4" height="3" rx="0.5"/>
+                <rect x="13" y="7" width="4" height="3" rx="0.5"/>
+                <path d="M2 15c1 3 4 5 10 5s10-2 10-5c-1-1-3-1-4-1H4c-1 0-1.5 0.5-2 1z"/>
+              </svg>
+            </div>
+            <span class="mono text-[.68rem] uppercase tracking-wider text-[var(--card-color)]">Infraestrutura</span>
+            <h3 class="text-xl font-bold mt-1 text-[var(--paper)]">Docker & Linux</h3>
+            <p class="mt-2 text-[.85rem] text-[var(--muted)] line-clamp-3">
+              Containerização de serviços, orquestração de ambientes de dev/prod, proxy reverso Nginx e administração de redes.
+            </p>
+            <div class="stack-card-code">
+              <span class="text-[var(--muted)] opacity-60">$ </span><span class="text-[#38BDF8]">docker compose</span> up -d --build
+            </div>
+            <div class="mono mt-4 flex flex-wrap gap-1.5 text-[.68rem]">
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Containers</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Nginx</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Redes</span>
+            </div>
+          </div>
+
+          <!-- Card 6: PyTorch & Gymnasium -->
+          <div class="stack-card rise" data-cat="ai" style="--card-color: #EE4C2C">
+            <div class="stack-icon-wrapper">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 16a6 6 0 1 1 6-6 6 6 0 0 1-6 6z"/>
+                <path d="M12 8v8M8 12h8"/>
+              </svg>
+            </div>
+            <span class="mono text-[.68rem] uppercase tracking-wider text-[var(--card-color)]">Inteligência Artificial</span>
+            <h3 class="text-xl font-bold mt-1 text-[var(--paper)]">PyTorch & Gym</h3>
+            <p class="mt-2 text-[.85rem] text-[var(--muted)] line-clamp-3">
+              Modelos de Aprendizado por Reforço (PPO, A2C, DQN), Stable-Baselines3 e análise de dados contínuos.
+            </p>
+            <div class="stack-card-code">
+              ppo_agent.<span class="text-[#EE4C2C]">learn</span>(total_timesteps=100k)
+            </div>
+            <div class="mono mt-4 flex flex-wrap gap-1.5 text-[.68rem]">
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">PPO / DQN</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Gymnasium</span>
+            </div>
+          </div>
+
+          <!-- Card 7: JavaScript Vanilla -->
+          <div class="stack-card rise" data-cat="frontend" style="--card-color: #F7DF1E">
+            <div class="stack-icon-wrapper">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/>
+              </svg>
+            </div>
+            <span class="mono text-[.68rem] uppercase tracking-wider text-[var(--card-color)]">Engenharia Web</span>
+            <h3 class="text-xl font-bold mt-1 text-[var(--paper)]">JavaScript ES6+</h3>
+            <p class="mt-2 text-[.85rem] text-[var(--muted)] line-clamp-3">
+              Desenvolvimento Vanilla, física de molas no DOM, manipulação de SVGs vetoriais e animações via rAF.
+            </p>
+            <div class="stack-card-code">
+              <span class="text-[#F7DF1E]">requestAnimationFrame</span>(updatePhysics);
+            </div>
+            <div class="mono mt-4 flex flex-wrap gap-1.5 text-[.68rem]">
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Vanilla DOM</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">rAF Physics</span>
+            </div>
+          </div>
+
+          <!-- Card 8: SQL & Business Intelligence -->
+          <div class="stack-card rise" data-cat="database" style="--card-color: var(--amber)">
+            <div class="stack-icon-wrapper">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+            </div>
+            <span class="mono text-[.68rem] uppercase tracking-wider text-[var(--card-color)]">Business Intelligence</span>
+            <h3 class="text-xl font-bold mt-1 text-[var(--paper)]">SQL & BI</h3>
+            <p class="mt-2 text-[.85rem] text-[var(--muted)] line-clamp-3">
+              Construção de relatórios executivos, queries otimizadas de agregação e geração automática de dashboards sem código.
+            </p>
+            <div class="stack-card-code">
+              <span class="text-[var(--amber)]">SELECT</span> exec, <span class="text-[var(--cyan)]">SUM</span>(val) <span class="text-[var(--amber)]">GROUP BY</span> 1
+            </div>
+            <div class="mono mt-4 flex flex-wrap gap-1.5 text-[.68rem]">
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Dashboards</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Analytics</span>
+            </div>
+          </div>
+
+          <!-- Card 9: CSS3 & Tailwind -->
+          <div class="stack-card rise" data-cat="frontend" style="--card-color: #38BDF8">
+            <div class="stack-icon-wrapper">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 21l3.47-.6c1.23.39 2.55.6 3.9.6 4.97 0 9-4.03 9-9s-4.03-9-9-9z"/>
+                <path d="M12 7v10M7 12h10"/>
+              </svg>
+            </div>
+            <span class="mono text-[.68rem] uppercase tracking-wider text-[var(--card-color)]">Design System</span>
+            <h3 class="text-xl font-bold mt-1 text-[var(--paper)]">Tailwind & CSS3</h3>
+            <p class="mt-2 text-[.85rem] text-[var(--muted)] line-clamp-3">
+              Design Systems com tokens customizados, CSS `@property`, suporte a temas escuros, glassmorphism e layouts 3D.
+            </p>
+            <div class="stack-card-code">
+              <span class="text-[#38BDF8]">@property</span> --q { syntax: <span class="text-[var(--amber)]">"&lt;number&gt;"</span>; }
+            </div>
+            <div class="mono mt-4 flex flex-wrap gap-1.5 text-[.68rem]">
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">@property</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Tailwind v4</span>
+            </div>
+          </div>
+
+          <!-- Card 10: Git & CI/CD -->
+          <div class="stack-card rise" data-cat="devops" style="--card-color: #F05032">
+            <div class="stack-icon-wrapper">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="18" r="3"/>
+                <circle cx="6" cy="6" r="3"/>
+                <circle cx="6" cy="18" r="3"/>
+                <path d="M6 9v6M9 6h4a5 5 0 0 1 5 5v4"/>
+              </svg>
+            </div>
+            <span class="mono text-[.68rem] uppercase tracking-wider text-[var(--card-color)]">Gestão de Código</span>
+            <h3 class="text-xl font-bold mt-1 text-[var(--paper)]">Git & Versionamento</h3>
+            <p class="mt-2 text-[.85rem] text-[var(--muted)] line-clamp-3">
+              Histórico consistente (+550 commits em microsserviços), revisão de código e boas práticas de branching em equipe.
+            </p>
+            <div class="stack-card-code">
+              <span class="text-[var(--muted)] opacity-60">$ </span><span class="text-[#F05032]">git commit</span> -m <span class="text-[var(--paper)]">"feat: cdc #550"</span>
+            </div>
+            <div class="mono mt-4 flex flex-wrap gap-1.5 text-[.68rem]">
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">Git Flow</span>
+              <span class="rounded border border-[var(--line)] bg-[var(--ink)] px-2 py-0.5 text-[var(--muted)]">GitHub</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Carousel Indicators / Dots -->
+        <div id="stack-dots" class="mt-6 flex justify-center items-center gap-2"></div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer id="contato" class="contact-section relative z-10 border-t border-[var(--line)] py-24 sm:py-36">
+  <div class="mx-auto max-w-[1180px] px-5 sm:px-10">
+    
+    <div class="contact-header">
+      <span class="tag mono text-[.74rem] uppercase tracking-[.18em] text-[var(--amber)]">// CONTATO</span>
+      <a href="mailto:morgantaria965@gmail.com" class="hero-email-link block group mt-3 no-underline" id="hero-copy-email" title="Clique para copiar o e-mail">
+        <h2 class="hero-title font-extrabold text-[clamp(2.8rem,7.5vw,7.5rem)] leading-[0.95] uppercase transition-colors duration-300 text-[var(--paper)] group-hover:text-[var(--amber)]">
+          VAMOS CONVERSAR<span class="text-[var(--amber)]">.</span>
+        </h2>
+      </a>
+      <p class="subtitle mt-6 max-w-[50ch] text-[var(--muted)] text-[1rem]">
+        Aberto a oportunidades em engenharia de dados, integrações e desenvolvimento full-stack.
+      </p>
+    </div>
+
+    <div class="contact-grid mt-14 grid gap-10 md:grid-cols-2 md:items-end border-t border-[var(--line)] pt-10">
+      
+      <div class="info-block space-y-6">
+        <div>
+          <span class="mono text-[.68rem] uppercase tracking-[.18em] text-[var(--amber)]">Status Profissional</span>
+          <div class="mt-2 flex items-center gap-3 text-[.95rem] font-medium text-[var(--paper)]">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+            </span>
+            Programador Full Stack na Trads Corretora
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 border-t border-[var(--line)]/60 pt-4 mono text-[.78rem]">
+          <div>
+            <span class="text-[var(--muted)] block">Localização</span>
+            <span class="text-[var(--paper)] font-medium mt-0.5 block">João Pessoa, PB (BRT)</span>
+          </div>
+          <div>
+            <span class="text-[var(--muted)] block">Atuação</span>
+            <span class="text-[var(--paper)] font-medium mt-0.5 block">Backend, CRM &amp; Integrações</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="links-block divide-y divide-[var(--line)]">
+        <a href="mailto:morgantaria965@gmail.com" class="aww-link group flex items-center justify-between py-4 text-xl no-underline text-[var(--paper)] transition-all duration-300 hover:pl-2 hover:text-[var(--amber)]" id="link-copy-email" title="Clique para copiar o e-mail">
+          <span class="mono font-medium">Email</span>
+          <span class="arrow transition-transform duration-300 cubic-bezier(0.16,1,0.3,1) group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
+        </a>
+        <a href="https://github.com/uMorgan" target="_blank" rel="noopener" class="aww-link group flex items-center justify-between py-4 text-xl no-underline text-[var(--paper)] transition-all duration-300 hover:pl-2 hover:text-[var(--amber)]">
+          <span class="mono font-medium">GitHub</span>
+          <span class="arrow transition-transform duration-300 cubic-bezier(0.16,1,0.3,1) group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
+        </a>
+        <a href="https://linkedin.com/in/umorgan" target="_blank" rel="noopener" class="aww-link group flex items-center justify-between py-4 text-xl no-underline text-[var(--paper)] transition-all duration-300 hover:pl-2 hover:text-[var(--amber)]">
+          <span class="mono font-medium">LinkedIn</span>
+          <span class="arrow transition-transform duration-300 cubic-bezier(0.16,1,0.3,1) group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
+        </a>
+      </div>
+
+    </div>
+
+    <p class="mono mt-16 text-[.7rem] tracking-[.06em] text-[var(--muted)]">
+      João Morgan de Almeida Lins do Vale &middot; João Pessoa, PB
+    </p>
+
+  </div>
+</footer>
+
+<!-- Toast de Cópia Rápida -->
+<div id="toast-copy" class="toast-copy" aria-hidden="true">
+  ✓ E-mail copiado para a área de transferência!
+</div>
+
+<script src="main.js?v=1785876369"></script>
+</body>
+</html>
