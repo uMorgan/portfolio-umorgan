@@ -160,7 +160,7 @@
           opacity:calc(var(--a1) * 1.2)}
 .bi .mesa-lbl{fill:var(--muted);font-size:4.4px;opacity:calc(var(--a1) * 1.2)}
 .bi .mesa-div{stroke:var(--line);stroke-width:1;opacity:calc(var(--e2) * .9)}
-.bi .mesa-hint{fill:var(--muted);font-size:4px;opacity:calc(var(--e2) * .8)}
+.bi .mesa-hint{fill:var(--muted);font-size:4px;opacity:calc(clamp(0, calc(1 - var(--e2) * 1.8), 1) * .85);transition:opacity .2s ease}
 
 /* a montagem compila: o SQL aparece linha a linha */
 .bi .sql{fill:color-mix(in srgb,var(--cyan) 6%,transparent);stroke:var(--cyan);stroke-width:1;
@@ -185,6 +185,7 @@
 .bi .v3{opacity:clamp(0, calc((var(--e4) - .66) * 6), 1)}
 .bi .v4{opacity:clamp(0, calc((var(--e4) - .74) * 6), 1)}
 .bi .note{opacity:clamp(0, calc((var(--a4) - .45) * 5), 1)}
+.bi + .cap, .bi .cap{bottom:.35rem;right:.75rem;font-size:.56rem}
 
 /* ═══ 03 · DISCADOR ═════════════════════════════════════════════════════
    ato 1 digita · ato 2 chama · ato 3 atende · ato 4 transcreve            */

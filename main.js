@@ -131,18 +131,35 @@
       if (!nosso && !andando) { alvoY = atualY = scrollY; }
     }, { passive: true });
 
-    document.documentElement.style.scrollBehavior = 'auto';
-    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
-      a.addEventListener('click', function (ev) {
-        var destino = document.querySelector(a.getAttribute('href'));
-        if (!destino) return;
-        ev.preventDefault();
-        alvoY = Math.max(0, Math.min(teto(), scrollY + destino.getBoundingClientRect().top));
+    return {
+      ativo: function () { return !desistiu; },
+      scrollToY: function (y) {
+        alvoY = Math.max(0, Math.min(teto(), y));
         liga();
-      });
-    });
-    return { ativo: function () { return !desistiu; } };
+      }
+    };
   })();
+
+  /* ── navegação suave por ancoras (funciona em todos os dispositivos) ─── */
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var href = a.getAttribute('href');
+      if (!href || href === '#') return;
+      var destino = document.querySelector(href);
+      if (!destino) return;
+
+      ev.preventDefault();
+      var header = document.querySelector('header');
+      var offset = (header ? header.offsetHeight : 56) - 6;
+      var targetY = href === '#topo' ? 0 : Math.max(0, scrollY + destino.getBoundingClientRect().top - offset);
+
+      if (rolagem && rolagem.ativo()) {
+        rolagem.scrollToY(targetY);
+      } else {
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+      }
+    });
+  });
 
   /* ── mola do progresso ────────────────────────────────────────────────
      Segunda camada. O motor acima já entrega posições contínuas, mas o valor

@@ -15,10 +15,36 @@
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
 }
 
-html{scroll-behavior:smooth}
+html{
+  scroll-behavior:smooth;
+  scrollbar-width:thin;
+  scrollbar-color:var(--line) var(--ink);
+}
 body{
   background:var(--ink);color:var(--paper);font-family:var(--body);
   -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+
+/* ── barra de rolagem customizada (Awwwards Style) ───── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--ink);
+  border-left: 1px solid color-mix(in srgb, var(--line) 40%, transparent);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 9999px;
+  border: 2px solid var(--ink);
+  transition: background 0.25s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--amber);
+}
+::-webkit-scrollbar-thumb:active {
+  background: var(--cyan);
 }
 /* Brilhos de fundo: pintados uma vez numa camada própria. Sem will-change o
    navegador repintava essa área enorme junto com a rolagem. */
