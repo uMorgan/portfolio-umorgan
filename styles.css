@@ -211,6 +211,19 @@ body.sem-cursor,body.sem-cursor *{cursor:none !important}
   background:linear-gradient(180deg,var(--amber),var(--cyan) 60%,var(--cyan));
   transform-origin:top;transform:scaleY(var(--draw,0));
 }
+/* Preferência: animação dirigida por scroll (Chrome 115+ etc.), desenhada pelo
+   compositor do navegador — imune a qualquer jitter de JS/rAF. O caminho por JS
+   (--draw) acima fica como fallback para navegadores sem suporte. */
+@keyframes spineFill{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@supports (animation-timeline: view()){
+  #track{view-timeline:--spineTl block}
+  .spine{
+    transform:scaleY(0);
+    animation:spineFill linear both;
+    animation-timeline:--spineTl;
+    animation-range:cover 0% cover 100%;
+  }
+}
 .node::before{
   content:"";position:absolute;left:-.4rem;top:.4rem;width:13px;height:13px;border-radius:50%;
   background:var(--ink);border:2px solid var(--line);
