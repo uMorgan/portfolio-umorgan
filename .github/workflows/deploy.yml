@@ -32,10 +32,16 @@ jobs:
         with:
           enablement: true
 
+      - name: Preparar artefato público
+        run: |
+          mkdir _site
+          cp index.html main.js styles.css scenes.css _site/
+          cp -r assets _site/
+
       - name: Fazer Upload do Artefato
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
 
       - name: Publicar no GitHub Pages
         id: deployment
