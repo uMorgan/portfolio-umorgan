@@ -65,6 +65,14 @@
       setTimeout(encerra, 640);
     }
 
+    if (reduce) {
+      intro.classList.add('curta');
+      setTimeout(encerra, 900);
+      addEventListener('pointerdown', encerra, { once: true });
+      addEventListener('keydown', encerra, { once: true });
+      return;
+    }
+
     var montagem = (pecas.length - 1) * 135 + 1050 + 500;   // escalonamento + peça + respiro
     setTimeout(voa, montagem);
     setTimeout(encerra, montagem + 1800);            // rede de segurança
@@ -198,7 +206,7 @@
 
   var molaHero = stack ? novaMola(stack, '--p') : null;
   var molaEspinha = spine ? novaMola(spine, '--draw', 0.3) : null;
-  var molasCena = [].slice.call(document.querySelectorAll('[data-anim]')).map(function (el) {
+  var molasCena = reduce ? [] : [].slice.call(document.querySelectorAll('[data-anim]')).map(function (el) {
     var m = novaMola(el, '--q');
     m.pin = el.closest('.pin');
     return m;
@@ -258,9 +266,15 @@
       }
     });
   }
-  addEventListener('scroll', revelaVisiveis, { passive: true });
-  addEventListener('touchmove', revelaVisiveis, { passive: true });
-  addEventListener('resize', revelaVisiveis, { passive: true });
+  var revelaAgendado = false;
+  function agendaRevela() {
+    if (revelaAgendado) return;
+    revelaAgendado = true;
+    requestAnimationFrame(function () { revelaAgendado = false; revelaVisiveis(); });
+  }
+  addEventListener('scroll', agendaRevela, { passive: true });
+  addEventListener('touchmove', agendaRevela, { passive: true });
+  addEventListener('resize', agendaRevela, { passive: true });
   setTimeout(revelaVisiveis, 400);
 
   /* Os nós da espinha acendem junto com o projeto a que pertencem. */
@@ -358,8 +372,14 @@
         (function(index) {
           var dot = document.createElement('span');
           dot.className = 'stack-dot' + (index === currentIndex ? ' active' : '');
+          dot.setAttribute('role', 'button');
+          dot.setAttribute('tabindex', '0');
+          dot.setAttribute('aria-label', 'Ir para o grupo ' + (index + 1));
           dot.addEventListener('click', function() {
             goTo(index);
+          });
+          dot.addEventListener('keydown', function(ev) {
+            if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); goTo(index); }
           });
           dotsContainer.appendChild(dot);
         })(i);
@@ -380,7 +400,7 @@
         track.style.transform = 'translateX(0)';
       }
 
-      var dots = [].slice.call(dotsContainer.querySelectorAll('.stack-dot'));
+      var dots = dotsContainer ? [].slice.call(dotsContainer.querySelectorAll('.stack-dot')) : [];
       dots.forEach(function(dot, i) {
         dot.classList.toggle('active', i === currentIndex);
       });
@@ -532,8 +552,10 @@
       if (!el) return;
       el.addEventListener('click', function(e) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText('morgantaria965@gmail.com');
-          showToast('✓ E-mail copiado para a área de transferência!');
+          e.preventDefault();
+          navigator.clipboard.writeText('morgantaria965@gmail.com')
+            .then(function() { showToast('✓ E-mail copiado para a área de transferência!'); })
+            .catch(function() { window.location.href = 'mailto:morgantaria965@gmail.com'; });
         }
       });
     });
@@ -561,12 +583,26 @@
     var menuOverlay = document.getElementById('mobile-menu');
     if (!toggleBtn || !menuOverlay) return;
 
+    var fundo = [document.querySelector('main'), document.querySelector('footer')];
+    function trapFocus(e) {
+      if (e.key !== 'Tab') return;
+      var f = menuOverlay.querySelectorAll('a[href], button');
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+
     function openMenu() {
       menuOverlay.classList.add('active');
       toggleBtn.classList.add('active');
       toggleBtn.setAttribute('aria-expanded', 'true');
       menuOverlay.setAttribute('aria-hidden', 'false');
       document.body.classList.add('menu-aberto');
+      fundo.forEach(function (el) { if (el) el.setAttribute('aria-hidden', 'true'); });
+      menuOverlay.addEventListener('keydown', trapFocus);
+      var primeiro = menuOverlay.querySelector('a[href], button');
+      if (primeiro) primeiro.focus();
     }
 
     function closeMenu() {
@@ -575,6 +611,9 @@
       toggleBtn.setAttribute('aria-expanded', 'false');
       menuOverlay.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('menu-aberto');
+      fundo.forEach(function (el) { if (el) el.removeAttribute('aria-hidden'); });
+      menuOverlay.removeEventListener('keydown', trapFocus);
+      toggleBtn.focus();
     }
 
     function toggleMenu() {
