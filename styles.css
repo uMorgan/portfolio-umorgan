@@ -207,23 +207,13 @@ body.sem-cursor,body.sem-cursor *{cursor:none !important}
 /* ── spine dos projetos ─────────────────────────────── */
 .spine,.spine-rail{position:absolute;left:0;top:.55rem;bottom:3rem;width:2px}
 .spine-rail{background:var(--line)}
+/* Linha estática (gradiente) ligando os dois projetos. O preenchimento dirigido
+   por scroll foi removido de propósito: o motor de rolagem customizado deixava a
+   posição do scroll levemente instável, e qualquer coisa amarrada a ela tremia.
+   Estática resolve de vez e lê como uma conexão/linha do tempo entre os sistemas. */
 .spine{
   background:linear-gradient(180deg,var(--amber),var(--cyan) 60%,var(--cyan));
-  transform-origin:top;transform:scaleY(var(--draw,0));
-}
-/* Preferência: animação dirigida por scroll (Chrome 115+ etc.), desenhada pelo
-   compositor do navegador — imune a qualquer jitter de JS/rAF. O caminho por JS
-   (--draw) acima fica como fallback para navegadores sem suporte. */
-@keyframes spineFill{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-@supports (animation-timeline: scroll()){
-  .spine{
-    transform:scaleY(0);
-    animation:spineFill linear both;
-    animation-timeline:scroll(root block);
-    /* --spineA/--spineB (px) são os offsets de scroll onde a linha começa e
-       termina de encher; o JS os calcula (= mesmo mapeamento do original). */
-    animation-range:var(--spineA, 0px) var(--spineB, 100000px);
-  }
+  transform-origin:top;transform:scaleY(1);
 }
 .node::before{
   content:"";position:absolute;left:-.4rem;top:.4rem;width:13px;height:13px;border-radius:50%;
