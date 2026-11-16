@@ -225,6 +225,11 @@
     var r = trilho.getBoundingClientRect();
     espTop = r.top + window.scrollY;
     espH = r.height || 1;
+    /* offsets de scroll para a animação CSS dirigida por scroll() */
+    var a = Math.max(0, espTop - innerHeight * 0.62);
+    var b = espTop + espH - innerHeight * 0.62;
+    document.documentElement.style.setProperty('--spineA', a.toFixed(0) + 'px');
+    document.documentElement.style.setProperty('--spineB', b.toFixed(0) + 'px');
   }
   /* A spine é desenhada direto no evento de scroll, lendo o scrollY já comitado
      pelo navegador. Fica fora do loop de molas (rAF) de propósito: antes, o loop

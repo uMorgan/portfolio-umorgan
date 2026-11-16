@@ -215,14 +215,14 @@ body.sem-cursor,body.sem-cursor *{cursor:none !important}
    compositor do navegador — imune a qualquer jitter de JS/rAF. O caminho por JS
    (--draw) acima fica como fallback para navegadores sem suporte. */
 @keyframes spineFill{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-@supports (animation-timeline: view()){
-  #track{view-timeline:--spineTl block}
+@supports (animation-timeline: scroll()){
   .spine{
     transform:scaleY(0);
     animation:spineFill linear both;
-    animation-timeline:--spineTl;
-    animation-range:cover 0% cover 100%;
-    animation-direction:reverse;
+    animation-timeline:scroll(root block);
+    /* --spineA/--spineB (px) são os offsets de scroll onde a linha começa e
+       termina de encher; o JS os calcula (= mesmo mapeamento do original). */
+    animation-range:var(--spineA, 0px) var(--spineB, 100000px);
   }
 }
 .node::before{
