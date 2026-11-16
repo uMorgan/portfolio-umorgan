@@ -205,7 +205,7 @@
   }
 
   var molaHero = stack ? novaMola(stack, '--p') : null;
-  var molaEspinha = spine ? novaMola(spine, '--draw', 0.3) : null;
+  var molaEspinha = null; // a spine é atualizada direto no evento de scroll (sem mola, sem corrida de rAF)
   var molasCena = reduce ? [] : [].slice.call(document.querySelectorAll('[data-anim]')).map(function (el) {
     var m = novaMola(el, '--q');
     m.pin = el.closest('.pin');
@@ -226,14 +226,24 @@
     espTop = r.top + window.scrollY;
     espH = r.height || 1;
   }
-  medeEspinha();
-  addEventListener('load', medeEspinha);
-  setTimeout(medeEspinha, 600);
-  setTimeout(medeEspinha, 1800);
+  /* A spine é desenhada direto no evento de scroll, lendo o scrollY já comitado
+     pelo navegador. Fica fora do loop de molas (rAF) de propósito: antes, o loop
+     das molas e o motor de rolagem eram dois rAF independentes e a spine lia a
+     posição num instante inconsistente, dando picos de um frame (a ponta
+     "crescia e encolhia aos trancos"). No scroll o valor é sempre coerente. */
+  function atualizaEspinha() {
+    if (!spine) return;
+    spine.style.setProperty('--draw',
+      limita((window.scrollY + innerHeight * 0.62 - espTop) / espH).toFixed(4));
+  }
+  medeEspinha(); atualizaEspinha();
+  addEventListener('scroll', atualizaEspinha, { passive: true });
+  addEventListener('load', function () { medeEspinha(); atualizaEspinha(); });
+  setTimeout(function () { medeEspinha(); atualizaEspinha(); }, 600);
+  setTimeout(function () { medeEspinha(); atualizaEspinha(); }, 1800);
 
   function mede() {
     if (molaHero && secHero) molaHero.alvo = progresso(secHero);
-    if (molaEspinha) molaEspinha.alvo = limita((window.scrollY + innerHeight * 0.62 - espTop) / espH);
     molasCena.forEach(function (m) {
       m.alvo = m.pin ? progresso(m.pin) : 0;
     });
@@ -257,7 +267,7 @@
 
   addEventListener('scroll', acorda, { passive: true });
   addEventListener('touchmove', acorda, { passive: true });
-  addEventListener('resize', function () { medeEspinha(); acorda(); });
+  addEventListener('resize', function () { medeEspinha(); atualizaEspinha(); acorda(); });
   mede();
   molas.forEach(function (m) { m.atual = m.alvo; m.el.style.setProperty(m.prop, m.atual.toFixed(4)); });
   acorda();
