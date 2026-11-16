@@ -222,6 +222,7 @@ body.sem-cursor,body.sem-cursor *{cursor:none !important}
     animation:spineFill linear both;
     animation-timeline:--spineTl;
     animation-range:cover 0% cover 100%;
+    animation-direction:reverse;
   }
 }
 .node::before{
