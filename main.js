@@ -215,12 +215,25 @@
   var secHero = document.getElementById('scene');
   var trilho = document.getElementById('track');
 
+  /* A spine lê o scroll direto (scrollY), não a posição na tela a cada frame.
+     Medir o track por getBoundingClientRect todo quadro fazia o alvo oscilar
+     (a ponta "crescia e encolhia aos trancos"); o topo/altura do track são
+     medidos uma vez e recalculados só em resize/load. */
+  var espTop = 0, espH = 1;
+  function medeEspinha() {
+    if (!trilho) return;
+    var r = trilho.getBoundingClientRect();
+    espTop = r.top + window.scrollY;
+    espH = r.height || 1;
+  }
+  medeEspinha();
+  addEventListener('load', medeEspinha);
+  setTimeout(medeEspinha, 600);
+  setTimeout(medeEspinha, 1800);
+
   function mede() {
     if (molaHero && secHero) molaHero.alvo = progresso(secHero);
-    if (molaEspinha && trilho) {
-      var rt = trilho.getBoundingClientRect();
-      molaEspinha.alvo = limita((innerHeight * 0.62 - rt.top) / rt.height);
-    }
+    if (molaEspinha) molaEspinha.alvo = limita((window.scrollY + innerHeight * 0.62 - espTop) / espH);
     molasCena.forEach(function (m) {
       m.alvo = m.pin ? progresso(m.pin) : 0;
     });
@@ -244,7 +257,7 @@
 
   addEventListener('scroll', acorda, { passive: true });
   addEventListener('touchmove', acorda, { passive: true });
-  addEventListener('resize', acorda);
+  addEventListener('resize', function () { medeEspinha(); acorda(); });
   mede();
   molas.forEach(function (m) { m.atual = m.alvo; m.el.style.setProperty(m.prop, m.atual.toFixed(4)); });
   acorda();
