@@ -173,8 +173,8 @@
   var molas = [];      // { el, prop, alvo, atual }
   var raf = 0;
 
-  function novaMola(el, prop) {
-    var m = { el: el, prop: prop, alvo: 0, atual: 0 };
+  function novaMola(el, prop, k) {
+    var m = { el: el, prop: prop, alvo: 0, atual: 0, k: k || PERSEGUE };
     molas.push(m);
     return m;
   }
@@ -197,7 +197,7 @@
   }
 
   var molaHero = stack ? novaMola(stack, '--p') : null;
-  var molaEspinha = spine ? novaMola(spine, '--draw') : null;
+  var molaEspinha = spine ? novaMola(spine, '--draw', 0.3) : null;
   var molasCena = [].slice.call(document.querySelectorAll('[data-anim]')).map(function (el) {
     var m = novaMola(el, '--q');
     m.pin = el.closest('.pin');
@@ -224,7 +224,7 @@
     var assentou = true;
     for (var i = 0; i < molas.length; i++) {
       var m = molas[i];
-      m.atual += (m.alvo - m.atual) * PERSEGUE;
+      m.atual += (m.alvo - m.atual) * (m.k || PERSEGUE);
       if (Math.abs(m.alvo - m.atual) > PARADO) assentou = false;
       else m.atual = m.alvo;
       m.el.style.setProperty(m.prop, m.atual.toFixed(4));
